@@ -67,7 +67,7 @@ function Auth() {
     <div className="auth-page">
       <div className="auth-container">
         <div className="auth-header">
-          <h1 className="auth-title">BD Quran Hub</h1>
+          <h1 className="auth-title">QuranNerds</h1>
           <p className="auth-subtitle">
             {isSignUp 
               ? 'Create an account to start sharing your Quran study insights'

@@ -1,4 +1,4 @@
-# BD Quran Hub
+# QuranNerds
 
 A Medium-inspired platform for sharing Quran study posts, reflections, and insights. Built with React.js, CSS, and Supabase.
 
@@ -84,7 +84,7 @@ See `supabase-schema.sql` for the complete SQL schema.
 ## Project Structure
 
 ```
-bdquranhub/
+qurannerds/
 ├── src/
 │   ├── components/       # Reusable components
 │   │   ├── Navbar.jsx

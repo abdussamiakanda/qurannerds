@@ -12,13 +12,13 @@
 }
 
 .settings-container {
-  background-color: #ffffff;
+  background-color: var(--card-bg);
 }
 
 .settings-title {
   font-size: 34px;
   font-weight: 400;
-  color: rgba(0, 0, 0, 0.84);
+  color: var(--text-primary);
   margin-bottom: 40px;
   font-family: 'Georgia', 'Times New Roman', serif;
   letter-spacing: -0.011em;
@@ -27,7 +27,7 @@
 .settings-section {
   margin-bottom: 48px;
   padding-bottom: 48px;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  border-bottom: 1px solid var(--border-color);
 }
 
 .settings-section:last-child {
@@ -39,7 +39,7 @@
 .section-title {
   font-size: 20px;
   font-weight: 400;
-  color: rgba(0, 0, 0, 0.84);
+  color: var(--text-primary);
   margin-bottom: 24px;
   font-family: 'Georgia', 'Times New Roman', serif;
 }
@@ -59,36 +59,36 @@
 .form-group label {
   font-size: 14px;
   font-weight: 400;
-  color: rgba(0, 0, 0, 0.84);
+  color: var(--text-primary);
 }
 
 .settings-input {
   padding: 10px 12px;
-  border: 1px solid rgba(0, 0, 0, 0.15);
+  border: 1px solid var(--input-border);
   border-radius: 4px;
   font-size: 16px;
-  color: rgba(0, 0, 0, 0.84);
+  color: var(--text-primary);
   transition: border-color 0.2s;
   font-family: inherit;
 }
 
 .settings-input:focus {
-  border-color: rgba(0, 0, 0, 0.3);
+  border-color: var(--border-hover);
   outline: none;
 }
 
 .settings-input.disabled {
-  background-color: rgba(0, 0, 0, 0.05);
+  background-color: var(--bg-tertiary);
   cursor: not-allowed;
-  color: rgba(0, 0, 0, 0.54);
+  color: var(--text-tertiary);
 }
 
 .settings-textarea {
   padding: 10px 12px;
-  border: 1px solid rgba(0, 0, 0, 0.15);
+  border: 1px solid var(--input-border);
   border-radius: 4px;
   font-size: 16px;
-  color: rgba(0, 0, 0, 0.84);
+  color: var(--text-primary);
   transition: border-color 0.2s;
   font-family: inherit;
   resize: vertical;
@@ -97,13 +97,13 @@
 }
 
 .settings-textarea:focus {
-  border-color: rgba(0, 0, 0, 0.3);
+  border-color: var(--border-hover);
   outline: none;
 }
 
 .form-help {
   font-size: 13px;
-  color: rgba(0, 0, 0, 0.54);
+  color: var(--text-tertiary);
   margin-top: -4px;
 }
 
@@ -118,8 +118,8 @@
   height: 120px;
   border-radius: 50%;
   overflow: hidden;
-  border: 3px solid rgba(0, 0, 0, 0.08);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border: 3px solid var(--border-color);
+  box-shadow: 0 2px 8px var(--shadow-sm);
   flex-shrink: 0;
 }
 
@@ -132,8 +132,8 @@
 .avatar-placeholder {
   width: 100%;
   height: 100%;
-  background: linear-gradient(135deg, rgba(0, 0, 0, 0.84) 0%, rgba(0, 0, 0, 0.7) 100%);
-  color: white;
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-hover) 100%);
+  color: var(--bg-primary);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -164,14 +164,14 @@
 }
 
 .avatar-upload-btn {
-  background-color: rgba(0, 0, 0, 0.84);
-  color: #ffffff;
+  background-color: var(--accent);
+  color: var(--bg-primary);
 }
 
 .avatar-upload-btn:hover:not(:disabled) {
-  background-color: rgba(0, 0, 0, 0.7);
+  background-color: var(--accent-hover);
   transform: translateY(-1px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 8px var(--shadow-md);
 }
 
 .avatar-remove-btn {
@@ -199,15 +199,15 @@
 }
 
 .settings-message.error {
-  background-color: #fee;
-  color: #d32f2f;
-  border: 1px solid #ffcdd2;
+  background-color: var(--red-bg-hover);
+  color: var(--red-primary);
+  border: 1px solid var(--red-border);
 }
 
 .settings-message.success {
-  background-color: #e8f5e9;
-  color: #2e7d32;
-  border: 1px solid #c8e6c9;
+  background-color: var(--green-bg-hover);
+  color: var(--green-primary);
+  border: 1px solid var(--green-border);
 }
 
 .settings-btn {
@@ -215,8 +215,8 @@
   border-radius: 99em;
   font-size: 16px;
   font-weight: 400;
-  background-color: rgba(0, 0, 0, 0.84);
-  color: #ffffff;
+  background-color: var(--accent);
+  color: var(--bg-primary);
   transition: background-color 0.2s;
   align-self: flex-start;
   cursor: pointer;
@@ -224,12 +224,18 @@
 }
 
 .settings-btn:hover:not(:disabled) {
-  background-color: rgba(0, 0, 0, 0.7);
+  background-color: var(--accent-hover);
 }
 
 .settings-btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+@media (max-width: 1024px) {
+  .settings {
+    padding: 32px 20px;
+  }
 }
 
 @media (max-width: 768px) {
@@ -243,6 +249,46 @@
 
   .section-title {
     font-size: 18px;
+  }
+
+  .avatar-upload-controls {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .avatar-upload-btn,
+  .avatar-remove-btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .settings {
+    padding: 20px 12px;
+  }
+
+  .settings-title {
+    font-size: 24px;
+  }
+
+  .section-title {
+    font-size: 16px;
+  }
+
+  .settings-input,
+  .settings-textarea {
+    font-size: 15px;
+  }
+
+  .settings-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .avatar-preview {
+    width: 100px;
+    height: 100px;
   }
 }
 

@@ -1,4 +1,5 @@
 import { BookOpen, Users, Heart, Target } from 'lucide-react'
+import LogoIcon from '../components/LogoIcon'
 import './About.css'
 
 function About() {
@@ -6,8 +7,8 @@ function About() {
     <div className="about-page">
       <div className="about-container">
         <div className="about-header">
-          <BookOpen size={48} className="about-icon" />
-          <h1 className="about-title">About BD Quran Hub</h1>
+          <LogoIcon size={48} className="about-icon" />
+          <h1 className="about-title">About QuranNerds</h1>
           <p className="about-subtitle">
             A platform dedicated to sharing knowledge, insights, and reflections on the Quran
           </p>
@@ -17,7 +18,7 @@ function About() {
           <section className="about-section">
             <h2 className="section-title">Our Mission</h2>
             <p className="section-text">
-              BD Quran Hub was created to provide a space where Muslims can come together to 
+              QuranNerds was created to provide a space where Muslims can come together to 
               share their study notes, reflections, and insights from the Quran. We believe 
               that knowledge grows when shared, and our platform facilitates meaningful 
               discussions and learning experiences.
@@ -89,7 +90,7 @@ function About() {
             <h2 className="section-title">Join Us</h2>
             <p className="section-text">
               Whether you're a student, teacher, or someone seeking to deepen your 
-              understanding of the Quran, BD Quran Hub welcomes you. Create an account 
+              understanding of the Quran, QuranNerds welcomes you. Create an account 
               to start sharing your insights, engaging with others, and contributing to 
               our growing community of learners.
             </p>

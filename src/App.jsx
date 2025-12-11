@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import { useState, useEffect } from 'react'
 import { supabase } from './lib/supabase'
+import { ThemeProvider } from './contexts/ThemeContext'
 import Navbar from './components/Navbar'
 import Home from './pages/Home'
 import Post from './pages/Post'
@@ -43,23 +44,25 @@ function App() {
   }
 
   return (
-    <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-      <div className="app">
-        <Navbar user={user} />
-        <Routes>
-          <Route path="/" element={<Home user={user} />} />
-          <Route path="/post/:id" element={<Post user={user} />} />
-          <Route path="/dashboard" element={<Dashboard user={user} />} />
-          <Route path="/create" element={<CreatePost user={user} />} />
-          <Route path="/edit/:id" element={<EditPost user={user} />} />
-          <Route path="/settings" element={<Settings user={user} />} />
-          <Route path="/profile/:userId" element={<Profile user={user} />} />
-          <Route path="/profile" element={<Profile user={user} />} />
-          <Route path="/auth" element={<Auth />} />
-          <Route path="/about" element={<About />} />
-        </Routes>
-      </div>
-    </Router>
+    <ThemeProvider>
+      <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+        <div className="app">
+          <Navbar user={user} />
+          <Routes>
+            <Route path="/" element={<Home user={user} />} />
+            <Route path="/post/:id" element={<Post user={user} />} />
+            <Route path="/dashboard" element={<Dashboard user={user} />} />
+            <Route path="/create" element={<CreatePost user={user} />} />
+            <Route path="/edit/:id" element={<EditPost user={user} />} />
+            <Route path="/settings" element={<Settings user={user} />} />
+            <Route path="/profile/:userId" element={<Profile user={user} />} />
+            <Route path="/profile" element={<Profile user={user} />} />
+            <Route path="/auth" element={<Auth />} />
+            <Route path="/about" element={<About />} />
+          </Routes>
+        </div>
+      </Router>
+    </ThemeProvider>
   )
 }
 

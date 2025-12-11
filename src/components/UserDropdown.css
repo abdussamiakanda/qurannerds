@@ -26,8 +26,8 @@
 }
 
 .user-avatar {
-  background: rgba(0, 0, 0, 0.84);
-  color: white;
+  background: var(--accent);
+  color: var(--bg-primary);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -39,10 +39,10 @@
   position: absolute;
   top: calc(100% + 8px);
   right: 0;
-  background: #ffffff;
-  border: 1px solid rgba(0, 0, 0, 0.08);
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
   border-radius: 4px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 8px var(--shadow-sm);
   min-width: 200px;
   z-index: 1000;
   overflow: hidden;
@@ -68,8 +68,8 @@
 }
 
 .dropdown-avatar {
-  background: rgba(0, 0, 0, 0.84);
-  color: white;
+  background: var(--accent);
+  color: var(--bg-primary);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -85,7 +85,7 @@
 .dropdown-user-name {
   font-size: 14px;
   font-weight: 400;
-  color: rgba(0, 0, 0, 0.84);
+  color: var(--text-primary);
   line-height: 1.4;
   margin-bottom: 2px;
   overflow: hidden;
@@ -95,7 +95,7 @@
 
 .dropdown-user-email {
   font-size: 13px;
-  color: rgba(0, 0, 0, 0.54);
+  color: var(--text-tertiary);
   line-height: 1.4;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -104,7 +104,7 @@
 
 .dropdown-divider {
   height: 1px;
-  background: rgba(0, 0, 0, 0.08);
+  background: var(--border-color);
   margin: 4px 0;
 }
 
@@ -117,7 +117,7 @@
   cursor: pointer;
   font-size: 14px;
   font-weight: 400;
-  color: rgba(0, 0, 0, 0.84);
+  color: var(--text-primary);
   transition: background-color 0.2s;
   display: flex;
   align-items: center;
@@ -125,7 +125,7 @@
 }
 
 .dropdown-item:hover {
-  background-color: rgba(0, 0, 0, 0.05);
+  background-color: var(--bg-tertiary);
 }
 
 .dropdown-item span {

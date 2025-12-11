@@ -1,5 +1,5 @@
 .rich-text-editor-wrapper {
-  background-color: #ffffff;
+  background-color: var(--card-bg);
   border-radius: 8px;
   display: flex;
   flex-direction: column;
@@ -8,36 +8,67 @@
 }
 
 .rich-text-editor {
-  background-color: #ffffff;
+  background-color: var(--card-bg);
   display: flex;
   flex-direction: column;
   height: 100%;
   overflow: hidden;
 }
 
-.rich-text-editor .ql-toolbar {
+.rich-text-editor .ql-toolbar.ql-snow {
   border: none;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  border-bottom: 1px solid var(--border-color);
   padding: 12px 0;
-  background-color: #ffffff;
+  background-color: var(--card-bg);
   position: sticky;
   top: 0;
   z-index: 10;
   flex-shrink: 0;
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.rich-text-editor .ql-toolbar {
+  border: none;
+  border-bottom: 1px solid var(--border-color);
+  padding: 12px 0;
+  background-color: var(--card-bg);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  flex-shrink: 0;
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.rich-text-editor .ql-container.ql-snow {
+  font-size: 21px;
+  line-height: 1.58;
+  color: var(--text-primary);
+  font-family: 'Georgia', 'Times New Roman', serif;
+  letter-spacing: -0.003em;
+  min-height: 400px;
+  border: none;
+  border-top: 1px solid var(--border-color);
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  background-color: var(--card-bg);
+  transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
 }
 
 .rich-text-editor .ql-container {
   font-size: 21px;
   line-height: 1.58;
-  color: rgba(0, 0, 0, 0.84);
+  color: var(--text-primary);
   font-family: 'Georgia', 'Times New Roman', serif;
   letter-spacing: -0.003em;
   min-height: 400px;
   border: none;
-  border-top: 1px solid rgba(0, 0, 0, 0.08);
+  border-top: 1px solid var(--border-color);
   flex: 1;
   overflow-y: auto;
   overflow-x: hidden;
+  background-color: var(--card-bg);
+  transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
 }
 
 .rich-text-editor .ql-editor {
@@ -46,44 +77,44 @@
 }
 
 .rich-text-editor .ql-editor.ql-blank::before {
-  color: rgba(0, 0, 0, 0.3);
+  color: var(--text-tertiary);
   font-style: normal;
   font-weight: 400;
 }
 
 .rich-text-editor .ql-toolbar .ql-stroke {
-  stroke: rgba(0, 0, 0, 0.54);
+  stroke: var(--text-secondary);
 }
 
 .rich-text-editor .ql-toolbar .ql-fill {
-  fill: rgba(0, 0, 0, 0.54);
+  fill: var(--text-secondary);
 }
 
 .rich-text-editor .ql-toolbar button:hover,
 .rich-text-editor .ql-toolbar button.ql-active {
-  color: rgba(0, 0, 0, 0.84);
+  color: var(--text-primary);
 }
 
 .rich-text-editor .ql-toolbar button:hover .ql-stroke,
 .rich-text-editor .ql-toolbar button.ql-active .ql-stroke {
-  stroke: rgba(0, 0, 0, 0.84);
+  stroke: var(--text-primary);
 }
 
 .rich-text-editor .ql-toolbar button:hover .ql-fill,
 .rich-text-editor .ql-toolbar button.ql-active .ql-fill {
-  fill: rgba(0, 0, 0, 0.84);
+  fill: var(--text-primary);
 }
 
 .rich-text-editor .ql-toolbar .ql-picker-label {
-  color: rgba(0, 0, 0, 0.54);
+  color: var(--text-secondary);
 }
 
 .rich-text-editor .ql-toolbar .ql-picker-label:hover {
-  color: rgba(0, 0, 0, 0.84);
+  color: var(--text-primary);
 }
 
 .rich-text-editor .ql-toolbar .ql-picker.ql-expanded .ql-picker-label {
-  color: rgba(0, 0, 0, 0.84);
+  color: var(--text-primary);
 }
 
 .rich-text-editor .ql-toolbar .ql-ayah {
@@ -94,7 +125,7 @@
   border: none;
   background: none;
   cursor: pointer;
-  color: rgba(0, 0, 0, 0.54);
+  color: var(--text-secondary);
   transition: all 0.2s ease;
   vertical-align: middle;
   position: relative;
@@ -108,27 +139,27 @@
 }
 
 .rich-text-editor .ql-toolbar .ql-ayah svg .ql-stroke {
-  stroke: rgba(0, 0, 0, 0.54);
+  stroke: var(--text-secondary);
 }
 
 .rich-text-editor .ql-toolbar .ql-ayah:hover,
 .rich-text-editor .ql-toolbar .ql-ayah.ql-active {
-  color: rgba(0, 0, 0, 0.84);
+  color: var(--text-primary);
 }
 
 .rich-text-editor .ql-toolbar .ql-ayah:hover svg .ql-stroke,
 .rich-text-editor .ql-toolbar .ql-ayah.ql-active svg .ql-stroke {
-  stroke: rgba(0, 0, 0, 0.84);
+  stroke: var(--text-primary);
 }
 
 /* Quran verse styles in editor */
 .rich-text-editor .ql-editor .quran-verse {
   margin: 2em 0;
   padding: 32px;
-  background: linear-gradient(135deg, rgba(0, 0, 0, 0.02) 0%, rgba(0, 0, 0, 0.04) 100%);
-  border-left: 5px solid rgba(0, 0, 0, 0.84);
+  background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%);
+  border-left: 5px solid var(--accent);
   border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 2px 8px var(--shadow-sm);
   position: relative;
   overflow: hidden;
 }
@@ -136,18 +167,18 @@
 .rich-text-editor .ql-editor .verse-header {
   margin-bottom: 24px;
   padding-bottom: 16px;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  border-bottom: 1px solid var(--border-color);
 }
 
 .rich-text-editor .ql-editor .verse-reference {
   font-size: 13px;
   font-weight: 600;
-  color: rgba(0, 0, 0, 0.64);
+  color: var(--text-secondary);
   text-transform: uppercase;
   letter-spacing: 1px;
   display: inline-block;
   padding: 6px 12px;
-  background-color: rgba(0, 0, 0, 0.05);
+  background-color: var(--bg-tertiary);
   border-radius: 6px;
 }
 
@@ -157,13 +188,13 @@
   text-align: right;
   direction: rtl;
   font-family: 'Amiri', 'Arabic Typesetting', 'Traditional Arabic', 'Arial', serif;
-  color: rgba(0, 0, 0, 0.9);
+  color: var(--text-primary);
   margin-bottom: 28px;
   padding: 24px;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.85) 100%);
+  background: linear-gradient(135deg, var(--card-bg) 0%, var(--bg-secondary) 100%);
   border-radius: 10px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
-  border: 1px solid rgba(0, 0, 0, 0.06);
+  box-shadow: 0 2px 6px var(--shadow-sm);
+  border: 1px solid var(--border-color);
 }
 
 .rich-text-editor .ql-editor .verse-translation {
@@ -177,17 +208,17 @@
 .rich-text-editor .ql-editor .verse-bangla {
   font-size: 16px;
   line-height: 1.8;
-  color: rgba(0, 0, 0, 0.84);
+  color: var(--text-primary);
   padding: 16px 20px;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.7) 100%);
+  background: linear-gradient(135deg, var(--card-bg) 0%, var(--bg-secondary) 100%);
   border-radius: 8px;
-  border-left: 3px solid rgba(0, 0, 0, 0.1);
+  border-left: 3px solid var(--border-color);
 }
 
 .rich-text-editor .ql-editor .verse-english strong,
 .rich-text-editor .ql-editor .verse-bangla strong {
   font-weight: 600;
-  color: rgba(0, 0, 0, 0.84);
+  color: var(--text-primary);
   display: inline-block;
   margin-right: 8px;
   font-size: 14px;
@@ -195,7 +226,17 @@
   letter-spacing: 0.5px;
 }
 
+@media (max-width: 1024px) {
+  .rich-text-editor-wrapper {
+    max-height: calc(100vh - 180px);
+  }
+}
+
 @media (max-width: 768px) {
+  .rich-text-editor-wrapper {
+    max-height: calc(100vh - 160px);
+  }
+
   .rich-text-editor .ql-container {
     font-size: 18px;
   }
@@ -215,6 +256,53 @@
   .rich-text-editor .ql-editor .verse-arabic {
     font-size: 22px;
     padding: 20px;
+  }
+
+  .rich-text-editor .ql-toolbar {
+    padding: 10px 0;
+  }
+
+  .rich-text-editor .ql-toolbar .ql-formats {
+    margin: 4px 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .rich-text-editor-wrapper {
+    max-height: calc(100vh - 140px);
+  }
+
+  .rich-text-editor .ql-container {
+    font-size: 16px;
+  }
+
+  .rich-text-editor .ql-editor {
+    min-height: 250px;
+    padding: 8px 0;
+  }
+
+  .rich-text-editor .ql-container {
+    min-height: 250px;
+  }
+
+  .rich-text-editor .ql-toolbar {
+    padding: 8px 0;
+    flex-wrap: wrap;
+  }
+
+  .rich-text-editor .ql-toolbar button {
+    width: 32px;
+    height: 32px;
+    padding: 4px;
+  }
+
+  .rich-text-editor .ql-editor .quran-verse {
+    padding: 16px;
+  }
+
+  .rich-text-editor .ql-editor .verse-arabic {
+    font-size: 20px;
+    padding: 16px;
   }
 }
 
