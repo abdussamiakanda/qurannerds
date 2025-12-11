@@ -12,6 +12,7 @@ import Settings from './pages/Settings'
 import Profile from './pages/Profile'
 import Auth from './pages/Auth'
 import About from './pages/About'
+import NotFound from './pages/NotFound'
 import './App.css'
 
 function App() {
@@ -59,6 +60,7 @@ function App() {
             <Route path="/profile" element={<Profile user={user} />} />
             <Route path="/auth" element={<Auth />} />
             <Route path="/about" element={<About />} />
+            <Route path="*" element={<NotFound />} />
           </Routes>
         </div>
       </Router>
