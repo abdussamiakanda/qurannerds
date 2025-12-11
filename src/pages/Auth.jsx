@@ -27,7 +27,7 @@ function Auth() {
           : 'Email confirmed! You are now signed in.'
         setMessage(messageText)
         setTimeout(() => {
-          navigate('/')
+          navigate('/dashboard')
         }, 2000)
       } else if (error) {
         setMessage('Error signing in. Please try again.')
@@ -55,7 +55,7 @@ function Auth() {
       // Check if user is already logged in
       supabase.auth.getSession().then(({ data: { session } }) => {
         if (session) {
-          navigate('/')
+          navigate('/dashboard')
         }
       })
     }
@@ -115,7 +115,7 @@ function Auth() {
 
         if (error) throw error
 
-        navigate('/')
+        navigate('/dashboard')
       }
     } catch (error) {
       setMessage(error.message || 'An error occurred')
