@@ -13,12 +13,46 @@ function Auth() {
   const [message, setMessage] = useState('')
 
   useEffect(() => {
-    // Check if user is already logged in
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session) {
-        navigate('/')
+    // Handle email confirmation callback
+    const handleAuthCallback = async () => {
+      // Wait a moment for Supabase to process the token
+      await new Promise(resolve => setTimeout(resolve, 500))
+      
+      const { data, error } = await supabase.auth.getSession()
+      
+      if (data?.session) {
+        setMessage('Email confirmed! You are now signed in.')
+        setTimeout(() => {
+          navigate('/')
+        }, 2000)
+      } else if (error) {
+        setMessage('Error confirming email. Please try again.')
       }
-    })
+    }
+
+    // Check URL for auth callback (email confirmation)
+    // Supabase uses hash fragments for PKCE flow
+    const hashParams = new URLSearchParams(window.location.hash.substring(1))
+    const accessToken = hashParams.get('access_token')
+    const type = hashParams.get('type')
+    
+    // Also check query parameters (some flows use these)
+    const queryParams = new URLSearchParams(window.location.search)
+    const queryToken = queryParams.get('access_token')
+    const queryType = queryParams.get('type')
+    
+    if ((accessToken && type === 'signup') || (queryToken && queryType === 'signup')) {
+      handleAuthCallback()
+      // Clean up URL
+      window.history.replaceState({}, document.title, window.location.pathname)
+    } else {
+      // Check if user is already logged in
+      supabase.auth.getSession().then(({ data: { session } }) => {
+        if (session) {
+          navigate('/')
+        }
+      })
+    }
   }, [navigate])
 
   const handleSubmit = async (e) => {
@@ -28,10 +62,15 @@ function Auth() {
 
     try {
       if (isSignUp) {
+        // Get the current site URL for redirect
+        const siteUrl = window.location.origin
+        const redirectTo = `${siteUrl}/auth`
+        
         const { data, error } = await supabase.auth.signUp({
           email,
           password,
           options: {
+            emailRedirectTo: redirectTo,
             data: {
               name: name || email.split('@')[0]
             }
