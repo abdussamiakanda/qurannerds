@@ -1,0 +1,562 @@
+.post-page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 60px 24px;
+  animation: fadeIn 0.4s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.post-loading,
+.post-not-found {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  gap: 20px;
+}
+
+.post-not-found h2 {
+  font-size: 32px;
+  color: rgba(0, 0, 0, 0.84);
+  font-weight: 400;
+}
+
+.post-not-found a {
+  color: rgba(0, 0, 0, 0.84);
+  text-decoration: underline;
+  transition: opacity 0.2s;
+}
+
+.post-not-found a:hover {
+  opacity: 0.7;
+}
+
+.post-article {
+  background-color: #ffffff;
+}
+
+.post-header {
+  margin-bottom: 48px;
+  padding-bottom: 32px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.post-title {
+  font-size: 48px;
+  font-weight: 400;
+  color: rgba(0, 0, 0, 0.84);
+  margin-bottom: 24px;
+  line-height: 1.15;
+  font-family: 'Georgia', 'Times New Roman', serif;
+  letter-spacing: -0.011em;
+}
+
+.post-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 24px;
+}
+
+.post-author-info {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex: 1;
+  min-width: 0;
+  text-decoration: none;
+  color: inherit;
+  transition: opacity 0.2s ease;
+  cursor: pointer;
+}
+
+.post-author-info:hover {
+  opacity: 0.8;
+}
+
+.post-author-avatar,
+.post-author-avatar-img {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border: 2px solid rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s ease;
+}
+
+.post-author-info:hover .post-author-avatar,
+.post-author-info:hover .post-author-avatar-img {
+  transform: scale(1.05);
+}
+
+.post-author-avatar {
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.84) 0%, rgba(0, 0, 0, 0.7) 100%);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 500;
+  font-size: 20px;
+}
+
+.post-author-name {
+  font-weight: 500;
+  font-size: 16px;
+  color: rgba(0, 0, 0, 0.84);
+  margin-bottom: 6px;
+  line-height: 1.4;
+}
+
+.post-meta-date {
+  font-size: 14px;
+  color: rgba(0, 0, 0, 0.54);
+  line-height: 1.4;
+}
+
+.post-actions {
+  display: flex;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.edit-btn,
+.delete-btn {
+  padding: 8px 18px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.edit-btn {
+  background-color: rgba(0, 0, 0, 0.84);
+  color: #ffffff;
+  border: none;
+}
+
+.edit-btn:hover {
+  background-color: rgba(0, 0, 0, 0.7);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.delete-btn {
+  background-color: transparent;
+  color: rgba(220, 38, 38, 0.8);
+  border: 1px solid rgba(220, 38, 38, 0.3);
+}
+
+.delete-btn:hover {
+  background-color: rgba(220, 38, 38, 0.05);
+  border-color: rgba(220, 38, 38, 0.5);
+  color: rgba(220, 38, 38, 1);
+  transform: translateY(-1px);
+}
+
+.post-content {
+  font-size: 21px;
+  line-height: 1.75;
+  color: rgba(0, 0, 0, 0.84);
+  letter-spacing: -0.003em;
+  font-family: 'Georgia', 'Times New Roman', serif;
+  max-width: 100%;
+  word-wrap: break-word;
+  margin-bottom: 32px;
+}
+
+.post-content p {
+  margin-bottom: 1.75em;
+}
+
+.post-content p:first-of-type {
+  font-size: 22px;
+  line-height: 1.8;
+  color: rgba(0, 0, 0, 0.9);
+  margin-bottom: 32px;
+}
+
+.post-content h1,
+.post-content h2,
+.post-content h3 {
+  font-family: 'Georgia', 'Times New Roman', serif;
+  font-weight: 400;
+  letter-spacing: -0.011em;
+  line-height: 1.12;
+  margin-top: 1.5em;
+  margin-bottom: 0.75em;
+  color: rgba(0, 0, 0, 0.84);
+}
+
+.post-content h1 {
+  font-size: 36px;
+}
+
+.post-content h2 {
+  font-size: 30px;
+}
+
+.post-content h3 {
+  font-size: 24px;
+}
+
+.post-content strong,
+.post-content b {
+  font-weight: 600;
+}
+
+.post-content em,
+.post-content i {
+  font-style: italic;
+}
+
+.post-content u {
+  text-decoration: underline;
+}
+
+.post-content ul,
+.post-content ol {
+  margin: 1.75em 0;
+  padding-left: 2em;
+}
+
+.post-content li {
+  margin-bottom: 0.5em;
+}
+
+.post-content blockquote {
+  border-left: 3px solid rgba(0, 0, 0, 0.84);
+  padding-left: 1.5em;
+  margin: 1.75em 0;
+  font-style: italic;
+  color: rgba(0, 0, 0, 0.7);
+}
+
+.post-content code {
+  background-color: rgba(0, 0, 0, 0.05);
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-family: 'Courier New', monospace;
+  font-size: 0.9em;
+}
+
+.post-content pre {
+  background-color: rgba(0, 0, 0, 0.05);
+  padding: 1em;
+  border-radius: 8px;
+  overflow-x: auto;
+  margin: 1.75em 0;
+}
+
+.post-content pre code {
+  background: none;
+  padding: 0;
+}
+
+.post-content a {
+  color: rgba(0, 0, 0, 0.84);
+  text-decoration: underline;
+  transition: opacity 0.2s ease;
+}
+
+.post-content a:hover {
+  opacity: 0.7;
+}
+
+.post-content img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  margin: 1.75em 0;
+}
+
+.post-content hr {
+  border: none;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+  margin: 2em 0;
+}
+
+.post-content .quran-verse {
+  margin: 3em 0;
+  padding: 32px;
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.02) 0%, rgba(0, 0, 0, 0.04) 100%);
+  border-left: 5px solid rgba(0, 0, 0, 0.84);
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.post-content .quran-verse::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, rgba(0, 0, 0, 0.1) 0%, transparent 100%);
+}
+
+.post-content .verse-header {
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.post-content .verse-reference {
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.64);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  display: inline-block;
+  padding: 6px 12px;
+  background-color: rgba(0, 0, 0, 0.05);
+  border-radius: 6px;
+}
+
+.post-content .verse-arabic {
+  font-size: 28px;
+  line-height: 2.2;
+  text-align: right;
+  direction: rtl;
+  font-family: 'Amiri', 'Arabic Typesetting', 'Traditional Arabic', 'Arial', serif;
+  color: rgba(0, 0, 0, 0.9);
+  margin-bottom: 28px;
+  padding: 24px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.85) 100%);
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  position: relative;
+}
+
+.post-content .verse-arabic::after {
+  content: '﴾';
+  position: absolute;
+  left: 16px;
+  top: 16px;
+  font-size: 20px;
+  color: rgba(0, 0, 0, 0.3);
+  font-family: 'Amiri', serif;
+}
+
+.post-content .verse-arabic::before {
+  content: '﴿';
+  position: absolute;
+  right: 16px;
+  bottom: 16px;
+  font-size: 20px;
+  color: rgba(0, 0, 0, 0.3);
+  font-family: 'Amiri', serif;
+}
+
+.post-content .verse-translation {
+  margin-top: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.post-content .verse-english,
+.post-content .verse-bangla {
+  font-size: 16px;
+  line-height: 1.8;
+  color: rgba(0, 0, 0, 0.84);
+  padding: 16px 20px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.7) 100%);
+  border-radius: 8px;
+  border-left: 3px solid rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.post-content .verse-english:hover,
+.post-content .verse-bangla:hover {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.8) 100%);
+  border-left-color: rgba(0, 0, 0, 0.2);
+  transform: translateX(2px);
+}
+
+.post-content .verse-english strong,
+.post-content .verse-bangla strong {
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.84);
+  display: inline-block;
+  margin-right: 8px;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+@media (max-width: 768px) {
+  .post-content .quran-verse {
+    padding: 20px;
+    margin: 2em 0;
+  }
+
+  .post-content .verse-header {
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+  }
+
+  .post-content .verse-reference {
+    font-size: 12px;
+    padding: 5px 10px;
+  }
+
+  .post-content .verse-arabic {
+    font-size: 22px;
+    line-height: 2;
+    padding: 20px;
+    margin-bottom: 24px;
+  }
+
+  .post-content .verse-arabic::after,
+  .post-content .verse-arabic::before {
+    font-size: 16px;
+  }
+
+  .post-content .verse-translation {
+    margin-top: 20px;
+    gap: 12px;
+  }
+
+  .post-content .verse-english,
+  .post-content .verse-bangla {
+    font-size: 15px;
+    line-height: 1.7;
+    padding: 14px 16px;
+  }
+
+  .post-content .verse-english strong,
+  .post-content .verse-bangla strong {
+    font-size: 13px;
+  }
+}
+
+.post-paragraph:empty {
+  display: none;
+}
+
+.post-engagement {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 48px;
+  padding-top: 32px;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.engagement-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background: transparent;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 500;
+  color: rgba(0, 0, 0, 0.64);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: inherit;
+}
+
+.engagement-btn:hover:not(:disabled) {
+  background-color: rgba(0, 0, 0, 0.05);
+  border-color: rgba(0, 0, 0, 0.25);
+  color: rgba(0, 0, 0, 0.84);
+  transform: translateY(-1px);
+}
+
+.engagement-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.like-btn.liked {
+  color: rgba(220, 38, 38, 0.9);
+  border-color: rgba(220, 38, 38, 0.3);
+  background-color: rgba(220, 38, 38, 0.05);
+}
+
+.like-btn.liked:hover:not(:disabled) {
+  background-color: rgba(220, 38, 38, 0.1);
+  border-color: rgba(220, 38, 38, 0.4);
+  color: rgba(220, 38, 38, 1);
+}
+
+.views-btn {
+  cursor: default;
+}
+
+.views-btn:hover {
+  transform: none;
+  background-color: transparent;
+}
+
+@media (max-width: 768px) {
+  .post-page {
+    padding: 32px 16px;
+  }
+
+  .post-header {
+    margin-bottom: 32px;
+    padding-bottom: 24px;
+  }
+
+  .post-title {
+    font-size: 36px;
+    margin-bottom: 20px;
+  }
+
+  .post-content {
+    font-size: 18px;
+    line-height: 1.7;
+  }
+
+  .post-paragraph:first-of-type {
+    font-size: 19px;
+    margin-bottom: 24px;
+  }
+
+  .post-meta {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .post-author-info {
+    width: 100%;
+  }
+
+  .post-actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+
+  .edit-btn,
+  .delete-btn {
+    flex: 1;
+    max-width: 120px;
+  }
+}
+

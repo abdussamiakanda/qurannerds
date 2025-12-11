@@ -1,0 +1,220 @@
+.rich-text-editor-wrapper {
+  background-color: #ffffff;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  max-height: calc(100vh - 200px);
+  overflow: hidden;
+}
+
+.rich-text-editor {
+  background-color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+
+.rich-text-editor .ql-toolbar {
+  border: none;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  padding: 12px 0;
+  background-color: #ffffff;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  flex-shrink: 0;
+}
+
+.rich-text-editor .ql-container {
+  font-size: 21px;
+  line-height: 1.58;
+  color: rgba(0, 0, 0, 0.84);
+  font-family: 'Georgia', 'Times New Roman', serif;
+  letter-spacing: -0.003em;
+  min-height: 400px;
+  border: none;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.rich-text-editor .ql-editor {
+  min-height: 400px;
+  padding: 12px 0;
+}
+
+.rich-text-editor .ql-editor.ql-blank::before {
+  color: rgba(0, 0, 0, 0.3);
+  font-style: normal;
+  font-weight: 400;
+}
+
+.rich-text-editor .ql-toolbar .ql-stroke {
+  stroke: rgba(0, 0, 0, 0.54);
+}
+
+.rich-text-editor .ql-toolbar .ql-fill {
+  fill: rgba(0, 0, 0, 0.54);
+}
+
+.rich-text-editor .ql-toolbar button:hover,
+.rich-text-editor .ql-toolbar button.ql-active {
+  color: rgba(0, 0, 0, 0.84);
+}
+
+.rich-text-editor .ql-toolbar button:hover .ql-stroke,
+.rich-text-editor .ql-toolbar button.ql-active .ql-stroke {
+  stroke: rgba(0, 0, 0, 0.84);
+}
+
+.rich-text-editor .ql-toolbar button:hover .ql-fill,
+.rich-text-editor .ql-toolbar button.ql-active .ql-fill {
+  fill: rgba(0, 0, 0, 0.84);
+}
+
+.rich-text-editor .ql-toolbar .ql-picker-label {
+  color: rgba(0, 0, 0, 0.54);
+}
+
+.rich-text-editor .ql-toolbar .ql-picker-label:hover {
+  color: rgba(0, 0, 0, 0.84);
+}
+
+.rich-text-editor .ql-toolbar .ql-picker.ql-expanded .ql-picker-label {
+  color: rgba(0, 0, 0, 0.84);
+}
+
+.rich-text-editor .ql-toolbar .ql-ayah {
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: rgba(0, 0, 0, 0.54);
+  transition: all 0.2s ease;
+  vertical-align: middle;
+  position: relative;
+}
+
+.rich-text-editor .ql-toolbar .ql-ayah svg {
+  width: 18px;
+  height: 18px;
+  display: block;
+  margin: 3px auto;
+}
+
+.rich-text-editor .ql-toolbar .ql-ayah svg .ql-stroke {
+  stroke: rgba(0, 0, 0, 0.54);
+}
+
+.rich-text-editor .ql-toolbar .ql-ayah:hover,
+.rich-text-editor .ql-toolbar .ql-ayah.ql-active {
+  color: rgba(0, 0, 0, 0.84);
+}
+
+.rich-text-editor .ql-toolbar .ql-ayah:hover svg .ql-stroke,
+.rich-text-editor .ql-toolbar .ql-ayah.ql-active svg .ql-stroke {
+  stroke: rgba(0, 0, 0, 0.84);
+}
+
+/* Quran verse styles in editor */
+.rich-text-editor .ql-editor .quran-verse {
+  margin: 2em 0;
+  padding: 32px;
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.02) 0%, rgba(0, 0, 0, 0.04) 100%);
+  border-left: 5px solid rgba(0, 0, 0, 0.84);
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  position: relative;
+  overflow: hidden;
+}
+
+.rich-text-editor .ql-editor .verse-header {
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.rich-text-editor .ql-editor .verse-reference {
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.64);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  display: inline-block;
+  padding: 6px 12px;
+  background-color: rgba(0, 0, 0, 0.05);
+  border-radius: 6px;
+}
+
+.rich-text-editor .ql-editor .verse-arabic {
+  font-size: 28px;
+  line-height: 2.2;
+  text-align: right;
+  direction: rtl;
+  font-family: 'Amiri', 'Arabic Typesetting', 'Traditional Arabic', 'Arial', serif;
+  color: rgba(0, 0, 0, 0.9);
+  margin-bottom: 28px;
+  padding: 24px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.85) 100%);
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.rich-text-editor .ql-editor .verse-translation {
+  margin-top: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.rich-text-editor .ql-editor .verse-english,
+.rich-text-editor .ql-editor .verse-bangla {
+  font-size: 16px;
+  line-height: 1.8;
+  color: rgba(0, 0, 0, 0.84);
+  padding: 16px 20px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.7) 100%);
+  border-radius: 8px;
+  border-left: 3px solid rgba(0, 0, 0, 0.1);
+}
+
+.rich-text-editor .ql-editor .verse-english strong,
+.rich-text-editor .ql-editor .verse-bangla strong {
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.84);
+  display: inline-block;
+  margin-right: 8px;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+@media (max-width: 768px) {
+  .rich-text-editor .ql-container {
+    font-size: 18px;
+  }
+
+  .rich-text-editor .ql-editor {
+    min-height: 300px;
+  }
+
+  .rich-text-editor .ql-container {
+    min-height: 300px;
+  }
+
+  .rich-text-editor .ql-editor .quran-verse {
+    padding: 20px;
+  }
+
+  .rich-text-editor .ql-editor .verse-arabic {
+    font-size: 22px;
+    padding: 20px;
+  }
+}
+
