@@ -68,7 +68,8 @@
   border-radius: 4px;
   font-size: 16px;
   color: var(--text-primary);
-  transition: border-color 0.2s;
+  background-color: var(--input-bg);
+  transition: border-color 0.2s, background-color 0.3s ease;
   font-family: inherit;
 }
 
@@ -89,7 +90,8 @@
   border-radius: 4px;
   font-size: 16px;
   color: var(--text-primary);
-  transition: border-color 0.2s;
+  background-color: var(--input-bg);
+  transition: border-color 0.2s, background-color 0.3s ease;
   font-family: inherit;
   resize: vertical;
   min-height: 100px;

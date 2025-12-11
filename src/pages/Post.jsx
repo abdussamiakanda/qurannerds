@@ -3,6 +3,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom'
 import { Heart, Eye, MessageCircle } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import Comments from '../components/Comments'
+import { processQuranicContent } from '../utils/textUtils'
 import './Post.css'
 
 function Post({ user }) {
@@ -240,7 +241,7 @@ function Post({ user }) {
 
         <div 
           className="post-content"
-          dangerouslySetInnerHTML={{ __html: post.content }}
+          dangerouslySetInnerHTML={{ __html: processQuranicContent(post.content) }}
         />
 
         <div className="post-engagement">

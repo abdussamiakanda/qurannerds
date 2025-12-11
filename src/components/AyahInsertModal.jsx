@@ -17,69 +17,111 @@ function AyahInsertModal({ isOpen, onClose, onInsert }) {
     }
 
     const surahNum = parseInt(surah)
-    const ayahNum = parseInt(ayah)
 
     if (isNaN(surahNum) || surahNum < 1 || surahNum > 114) {
       setError('Surah number must be between 1 and 114')
       return
     }
 
-    if (isNaN(ayahNum) || ayahNum < 1) {
-      setError('Ayah number must be a positive number')
-      return
+    // Parse ayah input - can be single number or range like "1-4"
+    let startAyah, endAyah
+    if (ayah.includes('-')) {
+      const parts = ayah.split('-').map(s => s.trim())
+      startAyah = parseInt(parts[0])
+      endAyah = parseInt(parts[1])
+      
+      if (isNaN(startAyah) || isNaN(endAyah) || startAyah < 1 || endAyah < 1) {
+        setError('Invalid ayah range. Use format like "1-4"')
+        return
+      }
+      
+      if (startAyah > endAyah) {
+        setError('Start ayah must be less than or equal to end ayah')
+        return
+      }
+    } else {
+      startAyah = parseInt(ayah)
+      endAyah = parseInt(ayah)
+      
+      if (isNaN(startAyah) || startAyah < 1) {
+        setError('Ayah number must be a positive number')
+        return
+      }
     }
 
     setLoading(true)
     setError('')
 
     try {
-      // Fetch from Al-Quran Cloud API
-      const [arabicRes, englishRes, banglaRes] = await Promise.all([
-        fetch(`https://api.alquran.cloud/v1/ayah/${surahNum}:${ayahNum}/ar.asad`).catch(() => null),
-        fetch(`https://api.alquran.cloud/v1/ayah/${surahNum}:${ayahNum}/en.asad`).catch(() => null),
-        fetch(`https://api.alquran.cloud/v1/ayah/${surahNum}:${ayahNum}/bn.bengali`).catch(() => null)
-      ])
+      // Fetch all ayahs in the range
+      const ayahPromises = []
+      for (let ayahNum = startAyah; ayahNum <= endAyah; ayahNum++) {
+        ayahPromises.push(
+          Promise.all([
+            fetch(`https://api.alquran.cloud/v1/ayah/${surahNum}:${ayahNum}/ar.asad`).catch(() => null),
+            fetch(`https://api.alquran.cloud/v1/ayah/${surahNum}:${ayahNum}/en.asad`).catch(() => null),
+            fetch(`https://api.alquran.cloud/v1/ayah/${surahNum}:${ayahNum}/bn.bengali`).catch(() => null)
+          ])
+        )
+      }
 
-      if (!arabicRes || !englishRes || !banglaRes) {
+      const allResponses = await Promise.all(ayahPromises)
+
+      // Check if any request failed
+      if (allResponses.some(res => !res[0] || !res[1] || !res[2])) {
         throw new Error('Failed to connect to API. Please check your internet connection.')
       }
 
-      const [arabicData, englishData, banglaData] = await Promise.all([
-        arabicRes.json(),
-        englishRes.json(),
-        banglaRes.json()
-      ])
+      // Parse all responses
+      const allData = await Promise.all(
+        allResponses.map(res => 
+          Promise.all([
+            res[0].json(),
+            res[1].json(),
+            res[2].json()
+          ])
+        )
+      )
 
-      if (arabicData.code !== 200 || !arabicData.data) {
-        throw new Error('Failed to fetch Arabic text. Please check the surah and ayah number.')
+      // Validate all responses
+      for (let i = 0; i < allData.length; i++) {
+        const [arabicData, englishData, banglaData] = allData[i]
+        if (arabicData.code !== 200 || !arabicData.data) {
+          throw new Error(`Failed to fetch Arabic text for ayah ${startAyah + i}. Please check the surah and ayah number.`)
+        }
+        if (englishData.code !== 200 || !englishData.data) {
+          throw new Error(`Failed to fetch English translation for ayah ${startAyah + i}. Please check the surah and ayah number.`)
+        }
+        if (banglaData.code !== 200 || !banglaData.data) {
+          throw new Error(`Failed to fetch Bengali translation for ayah ${startAyah + i}. Please check the surah and ayah number.`)
+        }
       }
 
-      if (englishData.code !== 200 || !englishData.data) {
-        throw new Error('Failed to fetch English translation. Please check the surah and ayah number.')
-      }
-
-      if (banglaData.code !== 200 || !banglaData.data) {
-        throw new Error('Failed to fetch Bengali translation. Please check the surah and ayah number.')
-      }
-
-      const arabicText = arabicData.data.text || ''
-      const englishText = englishData.data.text || ''
-      const banglaText = banglaData.data.text || ''
-      const surahName = arabicData.data.surah?.englishName || `Surah ${surahNum}`
-      const ayahNumber = arabicData.data.numberInSurah || ayahNum
+      // Get surah name from first ayah
+      const surahName = allData[0][0].data.surah?.englishName || `Surah ${surahNum}`
+      
+      // Combine all ayahs
+      const arabicTexts = allData.map(([arabicData]) => arabicData.data.text || '').join(' ')
+      const englishTexts = allData.map(([, englishData]) => englishData.data.text || '').join(' ')
+      const banglaTexts = allData.map(([, , banglaData]) => banglaData.data.text || '').join(' ')
+      
+      // Format reference (e.g., "Al-Baqara 1-4" or "Al-Baqara 1")
+      const referenceText = startAyah === endAyah 
+        ? `${surahName} ${startAyah}`
+        : `${surahName} ${startAyah}-${endAyah}`
 
       // Format the verse for insertion
       const formattedVerse = `
 <div class="quran-verse">
   <div class="verse-header">
-    <span class="verse-reference">${surahName} ${ayahNumber}</span>
+    <span class="verse-reference">${referenceText}</span>
   </div>
   <div class="verse-arabic">
-    ${arabicText}
+    ${arabicTexts}
   </div>
   <div class="verse-translation">
-    <p class="verse-english"><strong>English:</strong> ${englishText}</p>
-    <p class="verse-bangla"><strong>বাংলা:</strong> ${banglaText}</p>
+    <p class="verse-english"><strong>English:</strong> ${englishTexts}</p>
+    <p class="verse-bangla"><strong>বাংলা:</strong> ${banglaTexts}</p>
   </div>
 </div>
 `
@@ -125,15 +167,14 @@ function AyahInsertModal({ isOpen, onClose, onInsert }) {
           </div>
 
           <div className="form-group">
-            <label htmlFor="ayah">Ayah Number</label>
+            <label htmlFor="ayah">Ayah Number (or range like 1-4)</label>
             <input
               id="ayah"
-              type="number"
-              min="1"
+              type="text"
               value={ayah}
               onChange={(e) => setAyah(e.target.value)}
               className="ayah-input"
-              placeholder="e.g., 1"
+              placeholder="e.g., 1 or 1-4"
               required
             />
           </div>

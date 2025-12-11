@@ -185,7 +185,7 @@
   margin-bottom: 1.75em;
 }
 
-.post-content p:first-of-type {
+.post-content > p:first-of-type {
   font-size: 22px;
   line-height: 1.8;
   color: var(--text-primary);
@@ -293,15 +293,16 @@
 }
 
 .post-content .quran-verse {
-  margin: 3em 0;
-  padding: 32px;
+  padding: 24px;
   background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%);
+  border: 1px solid var(--border-color);
   border-left: 5px solid var(--accent);
   border-radius: 12px;
   box-shadow: 0 2px 8px var(--shadow-sm);
   position: relative;
   overflow: hidden;
   transition: all 0.3s ease;
+  margin-bottom: 1em !important;
 }
 
 .post-content .quran-verse::before {
@@ -315,12 +316,14 @@
 }
 
 .post-content .verse-header {
-  margin-bottom: 24px;
-  padding-bottom: 16px;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
   border-bottom: 1px solid var(--border-color);
+  text-align: right;
 }
 
 .post-content .verse-reference {
+  font-family: monospace;
   font-size: 13px;
   font-weight: 600;
   color: var(--text-secondary);
@@ -329,18 +332,20 @@
   display: inline-block;
   padding: 6px 12px;
   background-color: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
   border-radius: 6px;
 }
 
 .post-content .verse-arabic {
-  font-size: 28px;
-  line-height: 2.2;
+  font-size: 21px;
+  line-height: 1.75;
   text-align: right;
   direction: rtl;
   font-family: 'Amiri', 'Arabic Typesetting', 'Traditional Arabic', 'Arial', serif;
   color: var(--text-primary);
-  margin-bottom: 28px;
-  padding: 24px;
+  margin-top: 16px;
+  margin-bottom: 20px;
+  padding: 20px 40px;
   background: linear-gradient(135deg, var(--card-bg) 0%, var(--bg-secondary) 100%);
   border-radius: 10px;
   box-shadow: 0 2px 6px var(--shadow-sm);
@@ -353,7 +358,7 @@
   position: absolute;
   left: 16px;
   top: 16px;
-  font-size: 20px;
+  font-size: 16px;
   color: var(--text-tertiary);
   font-family: 'Amiri', serif;
 }
@@ -363,28 +368,29 @@
   position: absolute;
   right: 16px;
   bottom: 16px;
-  font-size: 20px;
+  font-size: 16px;
   color: var(--text-tertiary);
   font-family: 'Amiri', serif;
 }
 
 .post-content .verse-translation {
-  margin-top: 24px;
+  margin-top: 20px;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 12px;
 }
 
 .post-content .verse-english,
 .post-content .verse-bangla {
-  font-size: 16px;
-  line-height: 1.8;
+  font-size: 18px !important;
+  line-height: 1.75;
   color: var(--text-primary);
   padding: 16px 20px;
   background: linear-gradient(135deg, var(--card-bg) 0%, var(--bg-secondary) 100%);
   border-radius: 8px;
   border-left: 3px solid var(--border-color);
   transition: all 0.3s ease;
+  margin-bottom: 0 !important;
 }
 
 .post-content .verse-english:hover,
@@ -400,7 +406,7 @@
   color: var(--text-primary);
   display: inline-block;
   margin-right: 8px;
-  font-size: 14px;
+  font-size: inherit;
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
@@ -422,32 +428,33 @@
   }
 
   .post-content .verse-arabic {
-    font-size: 22px;
-    line-height: 2;
-    padding: 20px;
-    margin-bottom: 24px;
+    font-size: 18px;
+    line-height: 1.7;
+    padding: 16px 24px;
+    margin-top: 12px;
+    margin-bottom: 16px;
   }
 
   .post-content .verse-arabic::after,
   .post-content .verse-arabic::before {
-    font-size: 16px;
+    font-size: 14px;
   }
 
   .post-content .verse-translation {
-    margin-top: 20px;
-    gap: 12px;
+    margin-top: 16px;
+    gap: 10px;
   }
 
   .post-content .verse-english,
   .post-content .verse-bangla {
-    font-size: 15px;
+    font-size: 16px;
     line-height: 1.7;
     padding: 14px 16px;
   }
 
   .post-content .verse-english strong,
   .post-content .verse-bangla strong {
-    font-size: 13px;
+    font-size: inherit;
   }
 }
 

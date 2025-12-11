@@ -13,6 +13,7 @@
   padding: 48px;
   max-width: 450px;
   width: 100%;
+  border: 1px solid var(--border-color);
 }
 
 .auth-header {
@@ -61,7 +62,8 @@
   border-radius: 8px;
   font-size: 16px;
   color: var(--text-primary);
-  transition: border-color 0.2s;
+  background-color: var(--input-bg);
+  transition: border-color 0.2s, background-color 0.3s ease;
   font-family: inherit;
 }
 
