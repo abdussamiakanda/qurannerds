@@ -190,17 +190,17 @@ function Profile({ user }) {
           </h2>
           {posts.length === 0 ? (
             <div className="profile-empty-posts">
-              <p>No posts yet.</p>
+              <p>No notes yet.</p>
               {isOwnProfile && (
                 <Link to="/dashboard" className="create-post-link">
-                  Create your first post
+                  Create your first note
                 </Link>
               )}
             </div>
           ) : (
             <div className="profile-posts-grid">
               {posts.map((post) => (
-                <Link key={post.id} to={`/post/${post.id}`} className="profile-post-card">
+                <Link key={post.id} to={`/note/${post.id}`} className="profile-post-card">
                   <h3 className="profile-post-title">{post.title}</h3>
                   <p className="profile-post-excerpt">
                     {getExcerpt(post.content, 150)}

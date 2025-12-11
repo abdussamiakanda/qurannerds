@@ -42,7 +42,7 @@
 .logo-icon {
   display: flex;
   align-items: center;
-  color: var(--text-primary);
+  color: var(--brand-quran);
   transition: color 0.3s ease;
 }
 

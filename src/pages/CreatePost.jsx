@@ -14,7 +14,7 @@ function CreatePost({ user }) {
     return (
       <div className="auth-required">
         <h2>Sign in required</h2>
-        <p>You need to sign in to create a post.</p>
+        <p>You need to sign in to create a note.</p>
         <button onClick={() => navigate('/auth')} className="auth-btn">
           Sign In
         </button>
@@ -49,10 +49,10 @@ function CreatePost({ user }) {
 
       if (error) throw error
 
-      navigate(`/post/${data.id}`)
+      navigate(`/note/${data.id}`)
     } catch (error) {
-      console.error('Error creating post:', error)
-      alert('Failed to create post. Please try again.')
+      console.error('Error creating note:', error)
+      alert('Failed to create note. Please try again.')
     } finally {
       setLoading(false)
     }
@@ -61,12 +61,12 @@ function CreatePost({ user }) {
   return (
     <div className="create-post-page">
       <div className="create-post-container">
-        <h1 className="create-post-title">Create New Post</h1>
+        <h1 className="create-post-title">Create New Note</h1>
         <form onSubmit={handleSubmit} className="create-post-form">
           <div className="form-group">
             <input
               type="text"
-              placeholder="Post Title"
+              placeholder="Note Title"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               className="title-input"

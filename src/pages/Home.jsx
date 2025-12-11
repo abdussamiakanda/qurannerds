@@ -1,206 +1,233 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { Heart, Eye, MessageCircle } from 'lucide-react'
+import { BookOpen, Users, Heart, Target, FileText, MessageSquare } from 'lucide-react'
 import { supabase } from '../lib/supabase'
-import { getExcerpt } from '../utils/textUtils'
+import LogoIcon from '../components/LogoIcon'
 import './Home.css'
 
-function Home({ user }) {
-  const [posts, setPosts] = useState([])
-  const [authorProfiles, setAuthorProfiles] = useState({})
-  const [postsStats, setPostsStats] = useState({})
-  const [loading, setLoading] = useState(true)
+function Home() {
+  const [stats, setStats] = useState({
+    totalNotes: 0,
+    totalUsers: 0,
+    totalLikes: 0,
+    totalComments: 0
+  })
+  const [statsLoading, setStatsLoading] = useState(true)
 
   useEffect(() => {
-    fetchPosts()
+    fetchStats()
   }, [])
 
-  const fetchPosts = async () => {
+  const fetchStats = async () => {
     try {
-      const { data, error } = await supabase
+      // Fetch total notes count
+      const { count: notesCount } = await supabase
         .from('posts')
-        .select('*')
-        .order('created_at', { ascending: false })
+        .select('*', { count: 'exact', head: true })
 
-      if (error) throw error
-      setPosts(data || [])
+      // Fetch total users count
+      const { count: usersCount } = await supabase
+        .from('profiles')
+        .select('*', { count: 'exact', head: true })
 
-      // Fetch profiles for all unique authors
-      if (data && data.length > 0) {
-        const postIds = data.map(post => post.id)
-        const authorIds = [...new Set(data.map(post => post.author_id).filter(Boolean))]
-        
-        if (authorIds.length > 0) {
-          const { data: profiles, error: profilesError } = await supabase
-            .from('profiles')
-            .select('id, avatar_url, name')
-            .in('id', authorIds)
+      // Fetch total likes count
+      const { count: likesCount } = await supabase
+        .from('post_likes')
+        .select('*', { count: 'exact', head: true })
 
-          if (profilesError) {
-            console.error('Error fetching profiles:', profilesError)
-          }
+      // Fetch total comments count
+      const { count: commentsCount } = await supabase
+        .from('comments')
+        .select('*', { count: 'exact', head: true })
 
-          if (profiles) {
-            const profilesMap = {}
-            profiles.forEach(profile => {
-              profilesMap[profile.id] = profile
-            })
-            setAuthorProfiles(profilesMap)
-          }
-        }
-
-        // Fetch likes and comments counts for all posts
-        if (postIds.length > 0) {
-          const [likesData, commentsData] = await Promise.all([
-            supabase
-              .from('post_likes')
-              .select('post_id')
-              .in('post_id', postIds),
-            supabase
-              .from('comments')
-              .select('post_id')
-              .in('post_id', postIds)
-          ])
-
-          const statsMap = {}
-          postIds.forEach(postId => {
-            statsMap[postId] = {
-              likes: 0,
-              comments: 0,
-              views: data.find(p => p.id === postId)?.views || 0
-            }
-          })
-
-          if (likesData.data) {
-            likesData.data.forEach(like => {
-              if (statsMap[like.post_id]) {
-                statsMap[like.post_id].likes++
-              }
-            })
-          }
-
-          if (commentsData.data) {
-            commentsData.data.forEach(comment => {
-              if (statsMap[comment.post_id]) {
-                statsMap[comment.post_id].comments++
-              }
-            })
-          }
-
-          setPostsStats(statsMap)
-        }
-      }
+      setStats({
+        totalNotes: notesCount || 0,
+        totalUsers: usersCount || 0,
+        totalLikes: likesCount || 0,
+        totalComments: commentsCount || 0
+      })
     } catch (error) {
-      console.error('Error fetching posts:', error)
+      console.error('Error fetching stats:', error)
     } finally {
-      setLoading(false)
+      setStatsLoading(false)
     }
   }
 
-  const formatDate = (dateString) => {
-    const date = new Date(dateString)
-    return date.toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    })
-  }
-
-  if (loading) {
-    return (
-      <div className="home-loading">
-        <div className="loading-spinner"></div>
-      </div>
-    )
+  const formatNumber = (num) => {
+    if (num >= 1000) {
+      return (num / 1000).toFixed(1) + 'K'
+    }
+    return num.toString()
   }
 
   return (
-    <div className="home">
-      <div className="home-header">
-        <h1 className="home-title">Quran Study Posts</h1>
-        <p className="home-subtitle">
-          Share your reflections, insights, and learnings from the Quran
-        </p>
-      </div>
-
-      <div className="posts-container">
-        {posts.length === 0 ? (
-          <div className="empty-state">
-            <p>No posts yet. Be the first to share your Quran study insights!</p>
-            {user && (
-              <Link to="/create" className="create-first-post-btn">
-                Create Your First Post
-              </Link>
-            )}
-          </div>
-        ) : (
-          <div className="posts-grid">
-            {posts.map((post) => {
-              const authorProfile = authorProfiles[post.author_id]
-              const authorAvatar = authorProfile?.avatar_url
-              const authorName = authorProfile?.name || post.author_name || post.author_email || 'Anonymous'
-              const authorInitial = authorName.charAt(0).toUpperCase()
-              const stats = postsStats[post.id] || { likes: 0, comments: 0, views: 0 }
-
-              return (
-                <Link key={post.id} to={`/post/${post.id}`} className="post-card">
-                  <div className="post-card-header">
-                    <div className="post-author">
-                      {authorAvatar && authorAvatar.trim() ? (
-                        <img 
-                          src={authorAvatar} 
-                          alt={authorName} 
-                          className="author-avatar-img"
-                          onError={(e) => {
-                            e.target.style.display = 'none'
-                            e.target.nextSibling.style.display = 'flex'
-                          }}
-                        />
-                      ) : null}
-                      <div 
-                        className="author-avatar"
-                        style={{ display: authorAvatar && authorAvatar.trim() ? 'none' : 'flex' }}
-                      >
-                        {authorInitial}
-                      </div>
-                      <div className="author-info">
-                        <div className="author-name">
-                          {authorName}
-                        </div>
-                        <div className="post-date">{formatDate(post.created_at)}</div>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="post-card-content">
-                    <h2 className="post-card-title">{post.title}</h2>
-                    <p className="post-card-excerpt">{getExcerpt(post.content, 150)}</p>
-                    <div className="post-card-footer">
-                      <div className="post-card-stats">
-                        <div className="post-stat-item">
-                          <Heart size={16} />
-                          <span>{stats.likes}</span>
-                        </div>
-                        <div className="post-stat-item">
-                          <MessageCircle size={16} />
-                          <span>{stats.comments}</span>
-                        </div>
-                        <div className="post-stat-item">
-                          <Eye size={16} />
-                          <span>{stats.views}</span>
-                        </div>
-                      </div>
-                      <span className="read-more">Read more</span>
-                    </div>
-                  </div>
+    <div className="home-page">
+      {/* Hero Section */}
+      <section className="hero-section">
+        <div className="hero-container">
+          <div className="hero-content">
+            <div className="hero-text">
+              <h1 className="hero-title">
+                Welcome to <span className="hero-brand">
+                  <span className="brand-quran">Quran</span>
+                  <span className="brand-nerds">Nerds</span>
+                </span>
+              </h1>
+              <p className="hero-subtitle">
+                A platform dedicated to sharing knowledge, insights, and reflections on the Quran. 
+                Join our community of learners and scholars.
+              </p>
+              <div className="hero-actions">
+                <Link to="/notes" className="hero-btn primary">
+                  Explore Notes
                 </Link>
-              )
-            })}
+              </div>
+            </div>
+            <div className="hero-image">
+              <LogoIcon size={400} className="hero-icon" />
+            </div>
           </div>
-        )}
+        </div>
+      </section>
+
+      {/* About Content */}
+      <div className="home-about">
+        <div className="home-about-container">
+          <div className="about-header">
+            <LogoIcon size={48} className="about-icon" />
+            <h2 className="about-title">
+              About <span className="brand-quran">Quran</span><span className="brand-nerds">Nerds</span>
+            </h2>
+            <p className="about-subtitle">
+              A platform dedicated to sharing knowledge, insights, and reflections on the Quran
+            </p>
+          </div>
+
+          {/* Stats Section */}
+          <div className="stats-section">
+            <div className="stats-grid">
+              <div className="stat-card">
+                <div className="stat-icon">
+                  <FileText size={32} />
+                </div>
+                <div className="stat-value">{statsLoading ? '...' : formatNumber(stats.totalNotes)}</div>
+                <div className="stat-label">Total Notes</div>
+              </div>
+              <div className="stat-card">
+                <div className="stat-icon">
+                  <Users size={32} />
+                </div>
+                <div className="stat-value">{statsLoading ? '...' : formatNumber(stats.totalUsers)}</div>
+                <div className="stat-label">Active Members</div>
+              </div>
+              <div className="stat-card">
+                <div className="stat-icon">
+                  <Heart size={32} />
+                </div>
+                <div className="stat-value">{statsLoading ? '...' : formatNumber(stats.totalLikes)}</div>
+                <div className="stat-label">Total Likes</div>
+              </div>
+              <div className="stat-card">
+                <div className="stat-icon">
+                  <MessageSquare size={32} />
+                </div>
+                <div className="stat-value">{statsLoading ? '...' : formatNumber(stats.totalComments)}</div>
+                <div className="stat-label">Comments</div>
+              </div>
+            </div>
+          </div>
+
+          <div className="about-content">
+            <section className="about-section">
+              <h3 className="section-title">Our Mission</h3>
+              <p className="section-text">
+                QuranNerds was created to provide a space where Muslims can come together to 
+                share their study notes, reflections, and insights from the Quran. We believe 
+                that knowledge grows when shared, and our platform facilitates meaningful 
+                discussions and learning experiences.
+              </p>
+            </section>
+
+            <section className="about-section">
+              <h3 className="section-title">What We Offer</h3>
+              <div className="features-grid">
+                <div className="feature-card">
+                  <BookOpen size={32} className="feature-icon" />
+                  <h4 className="feature-title">Study Notes</h4>
+                  <p className="feature-text">
+                    Share your reflections, notes, and insights from your Quran study journey
+                  </p>
+                </div>
+                <div className="feature-card">
+                  <Users size={32} className="feature-icon" />
+                  <h4 className="feature-title">Community</h4>
+                  <p className="feature-text">
+                    Connect with fellow learners and engage in meaningful discussions
+                  </p>
+                </div>
+                <div className="feature-card">
+                  <Heart size={32} className="feature-icon" />
+                  <h4 className="feature-title">Engagement</h4>
+                  <p className="feature-text">
+                    Like, comment, and interact with notes that inspire and educate
+                  </p>
+                </div>
+                <div className="feature-card">
+                  <Target size={32} className="feature-icon" />
+                  <h4 className="feature-title">Learning</h4>
+                  <p className="feature-text">
+                    Discover new perspectives and deepen your understanding of the Quran
+                  </p>
+                </div>
+              </div>
+            </section>
+
+            <section className="about-section">
+              <h3 className="section-title">Our Values</h3>
+              <div className="values-list">
+                <div className="value-item">
+                  <h4 className="value-title">Respect</h4>
+                  <p className="value-text">
+                    We foster an environment of mutual respect and understanding, where diverse 
+                    perspectives are welcomed and valued.
+                  </p>
+                </div>
+                <div className="value-item">
+                  <h4 className="value-title">Knowledge</h4>
+                  <p className="value-text">
+                    We believe in the power of shared knowledge and continuous learning from 
+                    the Quran and from each other.
+                  </p>
+                </div>
+                <div className="value-item">
+                  <h4 className="value-title">Community</h4>
+                  <p className="value-text">
+                    We build a supportive community where members can grow together in their 
+                    faith and understanding.
+                  </p>
+                </div>
+              </div>
+            </section>
+
+            <section className="about-section join-section">
+              <div className="join-content">
+                <h3 className="section-title">Join Us</h3>
+                <p className="section-text">
+                  Whether you're a student, teacher, or someone seeking to deepen your 
+                  understanding of the Quran, <span className="brand-quran">Quran</span><span className="brand-nerds">Nerds</span> welcomes you. Create an account 
+                  to start sharing your insights, engaging with others, and contributing to 
+                  our growing community of learners.
+                </p>
+                <Link to="/auth" className="join-cta-btn">
+                  Get Started
+                </Link>
+              </div>
+            </section>
+          </div>
+        </div>
       </div>
     </div>
   )
 }
 
 export default Home
-

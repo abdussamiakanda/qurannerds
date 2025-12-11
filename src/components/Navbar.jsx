@@ -13,12 +13,15 @@ function Navbar({ user }) {
       <div className="navbar-container">
         <Link to="/" className="navbar-logo">
           <LogoIcon className="logo-icon" size={24} />
-          <span className="logo-text">QuranNerds</span>
+          <span className="logo-text">
+            <span className="brand-quran">Quran</span>
+            <span className="brand-nerds">Nerds</span>
+          </span>
         </Link>
         
         <div className="navbar-links">
-          <Link to="/about" className="navbar-link">
-            About
+          <Link to="/notes" className="navbar-link">
+            Notes
           </Link>
           <button 
             className="theme-toggle"

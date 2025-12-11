@@ -34,7 +34,7 @@ function EditPost({ user }) {
       setTitle(data.title)
       setContent(data.content)
     } catch (error) {
-      console.error('Error fetching post:', error)
+      console.error('Error fetching note:', error)
       navigate('/')
     } finally {
       setLoading(false)
@@ -63,10 +63,10 @@ function EditPost({ user }) {
 
       if (error) throw error
 
-      navigate(`/post/${id}`)
+      navigate(`/note/${id}`)
     } catch (error) {
-      console.error('Error updating post:', error)
-      alert('Failed to update post. Please try again.')
+      console.error('Error updating note:', error)
+      alert('Failed to update note. Please try again.')
     } finally {
       setSaving(false)
     }
@@ -76,7 +76,7 @@ function EditPost({ user }) {
     return (
       <div className="auth-required">
         <h2>Sign in required</h2>
-        <p>You need to sign in to edit a post.</p>
+        <p>You need to sign in to edit a note.</p>
         <button onClick={() => navigate('/auth')} className="auth-btn">
           Sign In
         </button>
@@ -95,12 +95,12 @@ function EditPost({ user }) {
   return (
     <div className="edit-post-page">
       <div className="edit-post-container">
-        <h1 className="edit-post-title">Edit Post</h1>
+        <h1 className="edit-post-title">Edit Note</h1>
         <form onSubmit={handleSubmit} className="edit-post-form">
           <div className="form-group">
             <input
               type="text"
-              placeholder="Post Title"
+              placeholder="Note Title"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               className="title-input"
@@ -120,7 +120,7 @@ function EditPost({ user }) {
             <div className="form-actions-inner">
               <button
                 type="button"
-                onClick={() => navigate(`/post/${id}`)}
+                onClick={() => navigate(`/note/${id}`)}
                 className="cancel-btn"
                 disabled={saving}
               >

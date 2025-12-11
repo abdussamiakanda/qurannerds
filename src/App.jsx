@@ -4,14 +4,14 @@ import { supabase } from './lib/supabase'
 import { ThemeProvider } from './contexts/ThemeContext'
 import Navbar from './components/Navbar'
 import Home from './pages/Home'
-import Post from './pages/Post'
+import Notes from './pages/Notes'
+import Note from './pages/Note'
 import Dashboard from './pages/Dashboard'
 import CreatePost from './pages/CreatePost'
 import EditPost from './pages/EditPost'
 import Settings from './pages/Settings'
 import Profile from './pages/Profile'
 import Auth from './pages/Auth'
-import About from './pages/About'
 import NotFound from './pages/NotFound'
 import './App.css'
 
@@ -50,8 +50,9 @@ function App() {
         <div className="app">
           <Navbar user={user} />
           <Routes>
-            <Route path="/" element={<Home user={user} />} />
-            <Route path="/post/:id" element={<Post user={user} />} />
+            <Route path="/" element={<Home />} />
+            <Route path="/notes" element={<Notes user={user} />} />
+            <Route path="/note/:id" element={<Note user={user} />} />
             <Route path="/dashboard" element={<Dashboard user={user} />} />
             <Route path="/create" element={<CreatePost user={user} />} />
             <Route path="/edit/:id" element={<EditPost user={user} />} />
@@ -59,7 +60,6 @@ function App() {
             <Route path="/profile/:userId" element={<Profile user={user} />} />
             <Route path="/profile" element={<Profile user={user} />} />
             <Route path="/auth" element={<Auth />} />
-            <Route path="/about" element={<About />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </div>

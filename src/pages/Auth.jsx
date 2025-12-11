@@ -128,7 +128,10 @@ function Auth() {
     <div className="auth-page">
       <div className="auth-container">
         <div className="auth-header">
-          <h1 className="auth-title">QuranNerds</h1>
+          <h1 className="auth-title">
+            <span className="brand-quran">Quran</span>
+            <span className="brand-nerds">Nerds</span>
+          </h1>
           <p className="auth-subtitle">
             {isForgotPassword
               ? 'Enter your email to receive a sign-in link'

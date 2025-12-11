@@ -16,6 +16,8 @@
   --card-bg: #ffffff;
   --input-bg: #ffffff;
   --input-border: rgba(0, 0, 0, 0.1);
+  --brand-quran: #32a55c;
+  --brand-nerds: #fbbf24;
 }
 
 [data-theme="dark"] {
@@ -36,6 +38,8 @@
   --card-bg: #0d1117;
   --input-bg: #0d1117;
   --input-border: rgba(255, 255, 255, 0.1);
+  --brand-quran: #32a55c;
+  --brand-nerds: #fbbf24;
 }
 
 * {
@@ -99,5 +103,16 @@ input, textarea {
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
+}
+
+/* Brand name two-color styling */
+.brand-quran {
+  color: var(--brand-quran);
+  transition: color 0.3s ease;
+}
+
+.brand-nerds {
+  color: var(--brand-nerds);
+  transition: color 0.3s ease;
 }
 

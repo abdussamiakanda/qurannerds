@@ -4,12 +4,12 @@ import { Heart, Eye, MessageCircle } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import Comments from '../components/Comments'
 import { processQuranicContent } from '../utils/textUtils'
-import './Post.css'
+import './Note.css'
 
-function Post({ user }) {
+function Note({ user }) {
   const { id } = useParams()
   const navigate = useNavigate()
-  const [post, setPost] = useState(null)
+  const [note, setNote] = useState(null)
   const [authorProfile, setAuthorProfile] = useState(null)
   const [likesCount, setLikesCount] = useState(0)
   const [isLiked, setIsLiked] = useState(false)
@@ -18,17 +18,17 @@ function Post({ user }) {
   const [liking, setLiking] = useState(false)
 
   useEffect(() => {
-    fetchPost()
+    fetchNote()
     incrementViews()
   }, [id])
 
   useEffect(() => {
-    if (post && user) {
+    if (note && user) {
       checkIfLiked()
     }
-  }, [post, user])
+  }, [note, user])
 
-  const fetchPost = async () => {
+  const fetchNote = async () => {
     try {
       const { data, error } = await supabase
         .from('posts')
@@ -37,7 +37,7 @@ function Post({ user }) {
         .single()
 
       if (error) throw error
-      setPost(data)
+      setNote(data)
       setViewsCount(data.views || 0)
 
       // Fetch author profile
@@ -61,7 +61,7 @@ function Post({ user }) {
 
       setLikesCount(count || 0)
     } catch (error) {
-      console.error('Error fetching post:', error)
+      console.error('Error fetching note:', error)
     } finally {
       setLoading(false)
     }
@@ -86,13 +86,13 @@ function Post({ user }) {
   }
 
   const checkIfLiked = async () => {
-    if (!user || !post) return
+    if (!user || !note) return
 
     try {
       const { data } = await supabase
         .from('post_likes')
         .select('id')
-        .eq('post_id', post.id)
+        .eq('post_id', note.id)
         .eq('user_id', user.id)
         .single()
 
@@ -105,7 +105,7 @@ function Post({ user }) {
 
   const handleLike = async () => {
     if (!user) {
-      alert('Please sign in to like posts')
+      alert('Please sign in to like notes')
       return
     }
 
@@ -116,7 +116,7 @@ function Post({ user }) {
         const { error } = await supabase
           .from('post_likes')
           .delete()
-          .eq('post_id', post.id)
+          .eq('post_id', note.id)
           .eq('user_id', user.id)
 
         if (error) throw error
@@ -128,7 +128,7 @@ function Post({ user }) {
           .from('post_likes')
           .insert([
             {
-              post_id: post.id,
+              post_id: note.id,
               user_id: user.id
             }
           ])
@@ -146,7 +146,7 @@ function Post({ user }) {
   }
 
   const handleDelete = async () => {
-    if (!window.confirm('Are you sure you want to delete this post?')) {
+    if (!window.confirm('Are you sure you want to delete this note?')) {
       return
     }
 
@@ -159,8 +159,8 @@ function Post({ user }) {
       if (error) throw error
       navigate('/')
     } catch (error) {
-      console.error('Error deleting post:', error)
-      alert('Failed to delete post')
+      console.error('Error deleting note:', error)
+      alert('Failed to delete note')
     }
   }
 
@@ -181,31 +181,31 @@ function Post({ user }) {
     )
   }
 
-  if (!post) {
+  if (!note) {
     return (
       <div className="post-not-found">
-        <h2>Post not found</h2>
+        <h2>Note not found</h2>
         <Link to="/">Go back home</Link>
       </div>
     )
   }
 
-  const isAuthor = user && user.id === post.author_id
+  const isAuthor = user && user.id === note.author_id
 
   return (
     <div className="post-page">
       <article className="post-article">
         <div className="post-header">
-          <h1 className="post-title">{post.title}</h1>
+          <h1 className="post-title">{note.title}</h1>
           <div className="post-meta">
             <Link 
-              to={`/profile/${post.author_id}`} 
+              to={`/profile/${note.author_id}`} 
               className="post-author-info"
             >
               {authorProfile?.avatar_url && authorProfile.avatar_url.trim() ? (
                 <img 
                   src={authorProfile.avatar_url} 
-                  alt={authorProfile.name || post.author_name}
+                  alt={authorProfile.name || note.author_name}
                   className="post-author-avatar-img"
                   onError={(e) => {
                     e.target.style.display = 'none'
@@ -217,18 +217,18 @@ function Post({ user }) {
                 className="post-author-avatar"
                 style={{ display: authorProfile?.avatar_url && authorProfile.avatar_url.trim() ? 'none' : 'flex' }}
               >
-                {(authorProfile?.name || post.author_name || post.author_email || 'A').charAt(0).toUpperCase()}
+                {(authorProfile?.name || note.author_name || note.author_email || 'A').charAt(0).toUpperCase()}
               </div>
               <div>
                 <div className="post-author-name">
-                  {authorProfile?.name || post.author_name || post.author_email || 'Anonymous'}
+                  {authorProfile?.name || note.author_name || note.author_email || 'Anonymous'}
                 </div>
-                <div className="post-meta-date">{formatDate(post.created_at)}</div>
+                <div className="post-meta-date">{formatDate(note.created_at)}</div>
               </div>
             </Link>
             {isAuthor && (
               <div className="post-actions">
-                <Link to={`/edit/${post.id}`} className="edit-btn">
+                <Link to={`/edit/${note.id}`} className="edit-btn">
                   Edit
                 </Link>
                 <button onClick={handleDelete} className="delete-btn">
@@ -241,7 +241,7 @@ function Post({ user }) {
 
         <div 
           className="post-content"
-          dangerouslySetInnerHTML={{ __html: processQuranicContent(post.content) }}
+          dangerouslySetInnerHTML={{ __html: processQuranicContent(note.content) }}
         />
 
         <div className="post-engagement">
@@ -262,10 +262,10 @@ function Post({ user }) {
         </div>
       </article>
 
-      <Comments postId={post.id} user={user} />
+      <Comments postId={note.id} user={user} />
     </div>
   )
 }
 
-export default Post
+export default Note
 

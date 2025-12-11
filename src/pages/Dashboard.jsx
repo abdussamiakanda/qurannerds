@@ -35,7 +35,7 @@ function Dashboard({ user }) {
   }
 
   const handleDelete = async (postId) => {
-    if (!window.confirm('Are you sure you want to delete this post?')) {
+    if (!window.confirm('Are you sure you want to delete this note?')) {
       return
     }
 
@@ -48,8 +48,8 @@ function Dashboard({ user }) {
       if (error) throw error
       fetchUserPosts()
     } catch (error) {
-      console.error('Error deleting post:', error)
-      alert('Failed to delete post')
+      console.error('Error deleting note:', error)
+      alert('Failed to delete note')
     }
   }
 
@@ -73,18 +73,18 @@ function Dashboard({ user }) {
   return (
     <div className="dashboard">
       <div className="dashboard-header">
-        <h1 className="dashboard-title">Your Posts</h1>
+        <h1 className="dashboard-title">Your Notes</h1>
         <Link to="/create" className="new-post-btn">
-          New Post
+          New Note
         </Link>
       </div>
 
       <div className="dashboard-content">
         {posts.length === 0 ? (
           <div className="dashboard-empty">
-            <p className="empty-message">You haven't written any posts yet.</p>
+            <p className="empty-message">You haven't written any notes yet.</p>
             <Link to="/create" className="create-first-btn">
-              Write your first post
+              Write your first note
             </Link>
           </div>
         ) : (
@@ -92,7 +92,7 @@ function Dashboard({ user }) {
             {posts.map((post) => (
               <div key={post.id} className="dashboard-post-card">
                 <div className="post-card-main">
-                  <Link to={`/post/${post.id}`} className="post-card-link">
+                  <Link to={`/note/${post.id}`} className="post-card-link">
                     <h2 className="post-card-title">{post.title}</h2>
                     <p className="post-card-excerpt">
                       {getExcerpt(post.content, 200)}
