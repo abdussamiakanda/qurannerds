@@ -28,7 +28,9 @@ Deno.serve(async (req) => {
       })
     }
 
-    const { type, noteId, noteTitle, noteAuthorName, commentAuthorName, commentContent, noteSlug }: EmailRequest = await req.json()
+    const body = await req.json()
+
+    const { type, noteId, noteTitle, noteAuthorName, commentAuthorName, commentContent, noteSlug }: EmailRequest = body
 
     if (!type) {
       return new Response(
@@ -84,8 +86,8 @@ Deno.serve(async (req) => {
       }
 
       // Construct the frontend URL
-      const baseUrl = SUPABASE_URL.replace('/rest/v1', '').replace('/functions/v1', '')
-      const noteUrl = noteSlug ? `${baseUrl}/note/${noteSlug}` : '#'
+      const noteUrl = noteSlug ? `https://qurannerds.netlify.app/note/${noteSlug}` : '#'
+
       
       subject = `New Note: ${noteTitle || 'Untitled'}`
       html = `
@@ -340,8 +342,7 @@ Deno.serve(async (req) => {
       }
 
       // Construct the frontend URL
-      const baseUrl = SUPABASE_URL.replace('/rest/v1', '').replace('/functions/v1', '')
-      const noteUrl = noteSlug ? `${baseUrl}/note/${noteSlug}` : '#'
+      const noteUrl = noteSlug ? `https://qurannerds.netlify.app/note/${noteSlug}` : '#'
       
       subject = `New Comment on: ${note.title || 'Untitled'}`
       html = `
@@ -601,4 +602,3 @@ Deno.serve(async (req) => {
     )
   }
 })
-

@@ -79,11 +79,14 @@ function CreatePost({ user }) {
       // Send email notification to all users (fire and forget)
       try {
         const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
+        const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
         
         fetch(`${supabaseUrl}/functions/v1/send-email`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
+            'Authorization': `Bearer ${supabaseAnonKey}`,
+            'apikey': supabaseAnonKey,
           },
           body: JSON.stringify({
             type: 'note',

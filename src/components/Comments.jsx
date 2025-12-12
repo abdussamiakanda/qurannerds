@@ -77,12 +77,15 @@ function Comments({ postId, user, noteSlug, noteTitle }) {
       // Send email notification to note author and other commenters (fire and forget)
       try {
         const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
+        const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
         const commentAuthorName = user.user_metadata?.name || user.email?.split('@')[0]
         
         fetch(`${supabaseUrl}/functions/v1/send-email`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
+            'Authorization': `Bearer ${supabaseAnonKey}`,
+            'apikey': supabaseAnonKey,
           },
           body: JSON.stringify({
             type: 'comment',
