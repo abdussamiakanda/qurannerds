@@ -382,6 +382,45 @@ function Note({ user }) {
 
   const incrementViews = async () => {
     if (!note) return
+    
+    // Check if this post has already been viewed by this user (using localStorage)
+    // This prevents counting multiple views from the same user on refresh
+    const viewKey = `post_viewed_${note.id}`
+    const hasViewed = localStorage.getItem(viewKey)
+    
+    // If already viewed in this session/browser, don't increment again
+    if (hasViewed) {
+      return
+    }
+    
+    // Mark as viewed in localStorage (expires after 24 hours)
+    const viewData = {
+      postId: note.id,
+      timestamp: Date.now(),
+      expiresAt: Date.now() + (24 * 60 * 60 * 1000) // 24 hours
+    }
+    localStorage.setItem(viewKey, JSON.stringify(viewData))
+    
+    // Clean up expired view records (optional cleanup)
+    try {
+      const keys = Object.keys(localStorage)
+      keys.forEach(key => {
+        if (key.startsWith('post_viewed_')) {
+          try {
+            const data = JSON.parse(localStorage.getItem(key))
+            if (data.expiresAt && Date.now() > data.expiresAt) {
+              localStorage.removeItem(key)
+            }
+          } catch (e) {
+            // Invalid data, remove it
+            localStorage.removeItem(key)
+          }
+        }
+      })
+    } catch (cleanupError) {
+      // Ignore cleanup errors
+    }
+    
     try {
       await supabase.rpc('increment_post_views', { post_uuid: note.id })
       // Refresh views count
