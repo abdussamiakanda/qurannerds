@@ -194,8 +194,8 @@ function AyahInsertModal({ onClose, onInsert }) {
     ${arabicTexts}
   </div>
   <div class="verse-translation">
-    <p class="verse-english"><strong>English:</strong> ${escapeHtml(englishTexts)}</p>
-    <p class="verse-bangla"><strong>বাংলা:</strong> ${escapeHtml(banglaTexts)}</p>
+    <div class="verse-english"><strong>English:</strong> ${escapeHtml(englishTexts)}</div>
+    <div class="verse-bangla"><strong>বাংলা:</strong> ${escapeHtml(banglaTexts)}</div>
   </div>
 </div>`.trim()
 

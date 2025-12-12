@@ -15,14 +15,136 @@ function RichTextEditor({ value, onChange, placeholder }) {
   const editorRef = useRef(null)
   const isUpdatingRef = useRef(false)
 
+  // Set default paragraph separator to 'div' instead of 'p'
+  useEffect(() => {
+    if (editorRef.current && document.execCommand) {
+      try {
+        // This sets the default block element for new lines
+        document.execCommand('defaultParagraphSeparator', false, 'div')
+      } catch (e) {
+        // Fallback for browsers that don't support this
+        console.warn('defaultParagraphSeparator not supported')
+      }
+    }
+  }, [])
+
+  // Normalize content: convert paragraphs to divs and wrap text nodes
+  const normalizeContent = (element) => {
+    if (!element) return
+    
+    // Collect all direct text nodes and adjacent text nodes
+    const childNodes = Array.from(element.childNodes)
+    const nodesToProcess = []
+    
+    childNodes.forEach(node => {
+      if (node.nodeType === Node.TEXT_NODE) {
+        const text = node.textContent.trim()
+        if (text) {
+          nodesToProcess.push({ type: 'text', node, text })
+        } else {
+          // Remove empty text nodes
+          node.remove()
+        }
+      } else if (node.nodeType === Node.ELEMENT_NODE) {
+        nodesToProcess.push({ type: 'element', node })
+      }
+    })
+    
+    // Process nodes: wrap consecutive text nodes in divs
+    let currentTextNodes = []
+    let currentText = ''
+    
+    nodesToProcess.forEach((item, index) => {
+      if (item.type === 'text') {
+        currentTextNodes.push(item.node)
+        currentText += (currentText ? ' ' : '') + item.text
+      } else {
+        // We hit an element, wrap accumulated text if any
+        if (currentText) {
+          const div = document.createElement('div')
+          div.textContent = currentText
+          // Insert before the current element
+          element.insertBefore(div, item.node)
+          // Remove the text nodes
+          currentTextNodes.forEach(textNode => textNode.remove())
+          currentTextNodes = []
+          currentText = ''
+        }
+        
+        // Handle paragraph elements - convert to divs
+        if (item.node.tagName === 'P') {
+          const div = document.createElement('div')
+          div.innerHTML = item.node.innerHTML
+          // Copy attributes
+          Array.from(item.node.attributes).forEach(attr => {
+            div.setAttribute(attr.name, attr.value)
+          })
+          element.replaceChild(div, item.node)
+        }
+        
+        // Handle div elements (skip quran-verse)
+        if (item.node.tagName === 'DIV') {
+          // Skip quran-verse divs
+          if (item.node.classList.contains('quran-verse')) return
+          
+          const innerHTML = item.node.innerHTML.trim()
+          const textContent = item.node.textContent.trim()
+          
+          if (innerHTML === '' || innerHTML === '<br>' || textContent === '') {
+            if (innerHTML === '<br>' || innerHTML === '') {
+              // Keep empty div with br
+              item.node.innerHTML = '<br>'
+            } else {
+              item.node.remove()
+            }
+          }
+          // Otherwise keep the div as is
+        }
+      }
+    })
+    
+    // Wrap any remaining text at the end
+    if (currentText) {
+      const div = document.createElement('div')
+      div.textContent = currentText
+      element.appendChild(div)
+      currentTextNodes.forEach(textNode => textNode.remove())
+    }
+    
+    // Process nested paragraphs (convert to divs, but not inside quran-verse)
+    const allParagraphs = element.querySelectorAll('p')
+    allParagraphs.forEach(p => {
+      if (p.closest('.quran-verse')) return
+      
+      const div = document.createElement('div')
+      div.innerHTML = p.innerHTML
+      // Copy attributes
+      Array.from(p.attributes).forEach(attr => {
+        div.setAttribute(attr.name, attr.value)
+      })
+      p.parentNode?.replaceChild(div, p)
+    })
+  }
+
   // Initialize content
   useEffect(() => {
     if (editorRef.current && value !== undefined && !isUpdatingRef.current) {
       if (editorRef.current.innerHTML !== value) {
         isUpdatingRef.current = true
         editorRef.current.innerHTML = value || ''
+        // Normalize after setting content
+        normalizeContent(editorRef.current)
         isUpdatingRef.current = false
       }
+    }
+    
+    // Ensure editor always has at least one div if it has content
+    if (editorRef.current && editorRef.current.textContent.trim() && 
+        !editorRef.current.querySelector('div, h1, h2, h3, blockquote, pre')) {
+      const div = document.createElement('div')
+      div.innerHTML = editorRef.current.innerHTML
+      editorRef.current.innerHTML = ''
+      editorRef.current.appendChild(div)
     }
   }, [value])
 
@@ -56,15 +178,81 @@ function RichTextEditor({ value, onChange, placeholder }) {
   const handleInput = () => {
     if (isUpdatingRef.current) return
     
+    // Save exactly what's in the editor without any modifications
     const html = editorRef.current.innerHTML
     onChange(html)
     updateCommandStates()
+  }
+
+  const handleKeyDown = (e) => {
+    // Handle Enter key to ensure it creates divs
+    if (e.key === 'Enter' && !e.shiftKey) {
+      const selection = window.getSelection()
+      if (selection.rangeCount > 0) {
+        const range = selection.getRangeAt(0)
+        let container = range.commonAncestorContainer
+        
+        // Find the block element we're in
+        while (container && container !== editorRef.current) {
+          if (container.nodeType === Node.ELEMENT_NODE) {
+            // If we're in a text node or directly in the editor, wrap in div first
+            if (container === editorRef.current) {
+              // We're directly in the editor, need to wrap current content
+              const textBefore = range.startContainer.textContent.substring(0, range.startOffset)
+              const textAfter = range.startContainer.textContent.substring(range.startOffset)
+              
+              if (textBefore.trim() || textAfter.trim()) {
+                // There's text, wrap it in a div
+                const div = document.createElement('div')
+                if (range.startContainer.nodeType === Node.TEXT_NODE) {
+                  div.textContent = textBefore
+                  const newRange = document.createRange()
+                  newRange.selectNodeContents(div)
+                  newRange.collapse(false)
+                  range.startContainer.textContent = textAfter
+                  editorRef.current.insertBefore(div, range.startContainer)
+                  selection.removeAllRanges()
+                  selection.addRange(newRange)
+                }
+              }
+              break
+            }
+            
+            // If we're in a paragraph, convert it to div first
+            if (container.tagName === 'P') {
+              const div = document.createElement('div')
+              div.innerHTML = container.innerHTML
+              container.parentNode?.replaceChild(div, container)
+              break
+            }
+            
+            // If we're already in a div (not quran-verse) or heading, that's fine
+            if ((container.tagName === 'DIV' && !container.classList.contains('quran-verse')) ||
+                container.tagName === 'H1' || container.tagName === 'H2' || 
+                container.tagName === 'H3' || container.tagName === 'BLOCKQUOTE' || 
+                container.tagName === 'PRE') {
+              break
+            }
+          }
+          container = container.parentNode
+        }
+      }
+      
+      // After Enter, save the content
+      setTimeout(() => {
+        handleInput()
+      }, 0)
+    }
   }
 
   const handlePaste = (e) => {
     e.preventDefault()
     const text = e.clipboardData.getData('text/plain')
     document.execCommand('insertText', false, text)
+    // Save after paste
+    setTimeout(() => {
+      handleInput()
+    }, 0)
   }
 
   const execCommand = (command, value = null) => {
@@ -75,8 +263,8 @@ function RichTextEditor({ value, onChange, placeholder }) {
       
       // Check if we're already in that format
       if (currentFormat === targetFormat) {
-        // Toggle off by converting to paragraph
-        document.execCommand('formatBlock', false, 'p')
+        // Toggle off by converting to div
+        document.execCommand('formatBlock', false, 'div')
       } else {
         // Apply the format
         document.execCommand('formatBlock', false, value)
@@ -94,7 +282,7 @@ function RichTextEditor({ value, onChange, placeholder }) {
   const toggleBlockquote = () => {
     const currentFormat = document.queryCommandValue('formatBlock').toLowerCase()
     if (currentFormat === 'blockquote') {
-      document.execCommand('formatBlock', false, 'p')
+      document.execCommand('formatBlock', false, 'div')
     } else {
       document.execCommand('formatBlock', false, 'blockquote')
     }
@@ -106,7 +294,7 @@ function RichTextEditor({ value, onChange, placeholder }) {
   const toggleCodeBlock = () => {
     const currentFormat = document.queryCommandValue('formatBlock').toLowerCase()
     if (currentFormat === 'pre') {
-      document.execCommand('formatBlock', false, 'p')
+      document.execCommand('formatBlock', false, 'div')
     } else {
       document.execCommand('formatBlock', false, 'pre')
     }
@@ -351,8 +539,9 @@ function RichTextEditor({ value, onChange, placeholder }) {
         contentEditable
         onInput={handleInput}
         onPaste={handlePaste}
-        onMouseUp={updateCommandStates}
+        onKeyDown={handleKeyDown}
         onKeyUp={updateCommandStates}
+        onMouseUp={updateCommandStates}
         onClick={updateCommandStates}
         data-placeholder={placeholder || 'Start writing...'}
         suppressContentEditableWarning

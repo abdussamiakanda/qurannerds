@@ -137,33 +137,43 @@ export function processQuranicContent(html) {
       verse.setAttribute('data-processed', 'true')
     })
 
-    // Get all direct child divs (only from the root, not nested)
-    const rootDivs = Array.from(tempDiv.children).filter(child => child.tagName === 'DIV')
+    // Get all direct children (divs, paragraphs, and other block elements)
+    const rootElements = Array.from(tempDiv.children)
     
     let processedHTML = ''
     let currentVerse = null
     let verseParts = []
     let i = 0
 
-    while (i < rootDivs.length) {
-      const div = rootDivs[i]
+    while (i < rootElements.length) {
+      const element = rootElements[i]
       
       // If this is already a processed quran-verse, preserve it as-is
-      if (div.classList.contains('quran-verse') || div.getAttribute('data-processed') === 'true') {
-        processedHTML += div.outerHTML
+      if (element.classList.contains('quran-verse') || element.getAttribute('data-processed') === 'true') {
+        processedHTML += element.outerHTML
         i++
         continue
       }
       
-      const text = div.textContent.trim()
-      const innerHTML = div.innerHTML.trim()
+      const text = element.textContent.trim()
+      const innerHTML = element.innerHTML.trim()
+      const tagName = element.tagName
 
-      // Skip empty divs (like <div><br></div>)
-      if (!text || text === '<br>' || text === '') {
+      // Handle elements with only <br> tags inside (like <p><br></p> or <div><br></div>)
+      if ((!text || text === '') && (innerHTML === '<br>' || innerHTML.trim() === '<br>')) {
         // If we have a verse in progress, keep it open
-        // Otherwise, add empty div as is
+        // Otherwise, preserve the element with br as is
         if (!currentVerse) {
-          processedHTML += `<div>${innerHTML}</div>`
+          processedHTML += element.outerHTML
+        }
+        i++
+        continue
+      }
+      
+      // Skip completely empty elements
+      if (!text && innerHTML.trim() === '') {
+        if (!currentVerse) {
+          processedHTML += element.outerHTML
         }
         i++
         continue
@@ -213,7 +223,7 @@ export function processQuranicContent(html) {
         processedHTML += buildVerseHTML(currentVerse, verseParts)
         currentVerse = null
         verseParts = []
-        // Don't increment i, process this div again as regular content
+        // Don't increment i, process this element again as regular content
         continue
       } else {
         // No Arabic found yet, discard this verse and process as regular
@@ -222,8 +232,16 @@ export function processQuranicContent(html) {
       }
     }
 
-    // Regular content - add as is
-    processedHTML += `<div>${innerHTML}</div>`
+    // Regular content - process br tags inside p tags
+    if (tagName === 'P' && innerHTML.includes('<br>')) {
+      // Normalize br tags: convert <p><br></p> to <p><br></p> (keep as is)
+      // But ensure multiple brs are handled properly
+      const normalizedHTML = innerHTML.replace(/<br\s*\/?>/gi, '<br>')
+      processedHTML += `<p>${normalizedHTML}</p>`
+    } else {
+      // Preserve the original tag
+      processedHTML += element.outerHTML
+    }
     i++
   }
 
