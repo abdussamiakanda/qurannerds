@@ -5,7 +5,7 @@ import { createProfileSlug } from '../utils/textUtils'
 import { MessageCircle, Trash2, Edit2 } from 'lucide-react'
 import './Comments.css'
 
-function Comments({ postId, user }) {
+function Comments({ postId, user, noteSlug, noteTitle }) {
   const [comments, setComments] = useState([])
   const [commentProfiles, setCommentProfiles] = useState({})
   const [newComment, setNewComment] = useState('')
@@ -73,6 +73,32 @@ function Comments({ postId, user }) {
         ])
 
       if (error) throw error
+
+      // Send email notification to note author and other commenters (fire and forget)
+      try {
+        const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
+        const commentAuthorName = user.user_metadata?.name || user.email?.split('@')[0]
+        
+        fetch(`${supabaseUrl}/functions/v1/send-email`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            type: 'comment',
+            noteId: postId,
+            commentAuthorName: commentAuthorName,
+            commentContent: newComment.trim(),
+            noteSlug: noteSlug,
+          }),
+        }).catch(err => {
+          console.error('Error sending email notification:', err)
+          // Don't block comment submission if email fails
+        })
+      } catch (emailError) {
+        console.error('Error sending email notification:', emailError)
+        // Don't block comment submission if email fails
+      }
 
       setNewComment('')
       fetchComments()

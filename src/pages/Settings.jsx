@@ -124,7 +124,6 @@ function Settings({ user }) {
         .from('images')
         .getPublicUrl(filePath)
 
-      console.log('Avatar uploaded, public URL:', publicUrl)
       setAvatarUrl(publicUrl)
       setAvatarPreview(publicUrl)
       setMessage('Avatar uploaded successfully!')
@@ -181,7 +180,6 @@ function Settings({ user }) {
         updated_at: new Date().toISOString()
       }
 
-      console.log('Saving profile with avatar_url:', profileData.avatar_url)
 
       const { error: profileError } = await supabase
         .from('profiles')

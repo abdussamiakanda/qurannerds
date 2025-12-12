@@ -312,7 +312,12 @@ function Note({ user }) {
         </div>
       </article>
 
-      <Comments postId={note.id} user={user} />
+      <Comments 
+        postId={note.id} 
+        user={user} 
+        noteSlug={slug}
+        noteTitle={note.title}
+      />
     </div>
   )
 }
