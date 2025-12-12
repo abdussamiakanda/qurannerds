@@ -23,6 +23,9 @@ function Navbar({ user }) {
           <Link to="/notes" className="navbar-link">
             Notes
           </Link>
+          <Link to="/groups" className="navbar-link">
+            Groups
+          </Link>
           <button 
             className="theme-toggle"
             onClick={toggleTheme}

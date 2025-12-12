@@ -743,8 +743,75 @@
   margin-bottom: 12px;
   width: 100%;
   display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.post-card-header .post-card-title {
+  flex: 1;
+  margin-bottom: 0;
+}
+
+.post-card-header .post-card-meta-header {
+  flex-shrink: 0;
+  display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--text-tertiary);
+  white-space: nowrap;
+}
+
+/* Group card specific styles */
+.group-card {
+  display: flex;
+  flex-direction: column;
+}
+
+.group-card .post-card-excerpt {
+  margin-bottom: 16px;
+  min-height: auto;
+}
+
+.group-card-meta {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font-size: 13px;
+  color: var(--text-tertiary);
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+.group-card-meta svg {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+}
+
+.group-meta-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text-tertiary);
+  transition: color 0.2s ease;
+}
+
+.group-card:hover .group-meta-item {
+  color: var(--text-secondary);
+}
+
+.group-card-actions {
+  margin-top: auto;
+  padding-top: 16px;
+  width: 100%;
+  border-top: 1px solid var(--border-color);
+}
+
+.group-card .new-post-btn {
+  width: 100%;
+  justify-content: center;
 }
 
 .post-author {
@@ -854,6 +921,12 @@
   overflow: hidden;
   text-overflow: ellipsis;
   transition: color 0.2s ease;
+  min-height: 4.8em; /* Ensure consistent height for 3 lines */
+}
+
+.post-card-excerpt:empty {
+  display: none;
+  margin-bottom: 0;
 }
 
 .post-card:hover .post-card-excerpt {

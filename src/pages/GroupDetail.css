@@ -1,0 +1,569 @@
+.group-detail-page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 40px 24px;
+}
+
+.group-detail-loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 60vh;
+}
+
+.group-detail-not-found {
+  text-align: center;
+  padding: 80px 20px;
+}
+
+.group-detail-not-found h2 {
+  font-size: 32px;
+  margin-bottom: 24px;
+  color: var(--text-primary);
+}
+
+.back-link {
+  display: inline-block;
+  padding: 12px 24px;
+  background-color: var(--accent);
+  color: var(--bg-primary);
+  border-radius: 99em;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.back-link:hover {
+  background-color: var(--accent-hover);
+  transform: translateY(-1px);
+}
+
+.group-detail-container {
+  width: 100%;
+}
+
+.group-detail-header {
+  margin-bottom: 40px;
+  padding-bottom: 32px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.group-detail-header-content {
+  margin-bottom: 24px;
+}
+
+.group-detail-title-section {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.group-detail-title {
+  font-size: 42px;
+  font-weight: 400;
+  color: var(--text-primary);
+  font-family: 'Georgia', 'Times New Roman', serif;
+  letter-spacing: -0.011em;
+  margin: 0;
+  line-height: 1.12;
+}
+
+.group-creator-badge,
+.group-admin-badge {
+  padding: 4px 12px;
+  border-radius: 99em;
+  font-size: 14px;
+  font-weight: 500;
+  text-transform: capitalize;
+}
+
+.group-creator-badge {
+  background-color: var(--accent);
+  color: var(--bg-primary);
+}
+
+.group-admin-badge {
+  background-color: var(--bg-tertiary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+}
+
+.group-detail-description {
+  font-size: 20px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0 0 20px 0;
+}
+
+.group-detail-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.group-meta-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 15px;
+  color: var(--text-secondary);
+}
+
+.group-detail-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.join-group-btn,
+.leave-group-btn,
+.manage-group-btn,
+.delete-group-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 7px 20px;
+  border-radius: 99em;
+  font-size: 16px;
+  font-weight: 400;
+  transition: all 0.3s ease;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 2px 4px var(--shadow-sm);
+  text-decoration: none;
+}
+
+.join-group-btn svg,
+.leave-group-btn svg,
+.manage-group-btn svg,
+.delete-group-btn svg {
+  flex-shrink: 0;
+}
+
+.join-group-btn {
+  background-color: var(--accent);
+  color: var(--bg-primary);
+  text-decoration: none;
+}
+
+[data-theme="dark"] .join-group-btn {
+  color: var(--bg-primary);
+}
+
+.join-group-btn:hover:not(:disabled) {
+  background-color: var(--accent-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px var(--shadow-md);
+}
+
+.leave-group-btn {
+  background-color: transparent;
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+}
+
+.leave-group-btn:hover:not(:disabled) {
+  background-color: var(--bg-tertiary);
+  border-color: var(--border-hover);
+}
+
+.manage-group-btn {
+  background-color: var(--bg-tertiary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+}
+
+.manage-group-btn:hover {
+  background-color: var(--bg-secondary);
+  border-color: var(--border-hover);
+}
+
+.delete-group-btn {
+  background-color: transparent;
+  color: rgba(220, 38, 38, 0.8);
+  border: 1px solid rgba(220, 38, 38, 0.3);
+}
+
+.delete-group-btn:hover {
+  background-color: rgba(220, 38, 38, 0.05);
+  border-color: rgba(220, 38, 38, 0.5);
+  color: rgba(220, 38, 38, 1);
+}
+
+.join-group-btn:disabled,
+.leave-group-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.group-detail-content {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 40px;
+}
+
+.group-members-section,
+.group-posts-section {
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 24px;
+}
+
+.section-title {
+  font-size: 24px;
+  font-weight: 500;
+  color: var(--text-primary);
+  margin: 0 0 20px 0;
+  font-family: 'Georgia', 'Times New Roman', serif;
+  letter-spacing: -0.011em;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.members-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 16px;
+}
+
+.member-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  text-decoration: none;
+  color: inherit;
+  transition: all 0.3s ease;
+}
+
+.member-card:hover {
+  background-color: var(--bg-tertiary);
+  border-color: var(--border-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px var(--shadow-sm);
+}
+
+.member-avatar,
+.member-avatar-img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.member-avatar {
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-hover) 100%);
+  color: var(--bg-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 500;
+  font-size: 16px;
+}
+
+.member-avatar-img {
+  object-fit: cover;
+}
+
+.member-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.member-name {
+  font-weight: 500;
+  font-size: 14px;
+  color: var(--text-primary);
+  margin-bottom: 2px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.member-role {
+  font-size: 12px;
+  color: var(--text-tertiary);
+  text-transform: capitalize;
+}
+
+.group-posts-empty {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--text-secondary);
+}
+
+.group-posts-empty p {
+  font-size: 16px;
+  margin: 0;
+}
+
+.group-posts-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.group-meeting-card {
+  display: block;
+  padding: 20px;
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.group-meeting-card:hover {
+  background-color: var(--bg-tertiary);
+  border-color: var(--border-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px var(--shadow-sm);
+}
+
+.group-meeting-header {
+  margin-bottom: 12px;
+}
+
+.group-meeting-title-section {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.group-meeting-title {
+  font-size: 20px;
+  font-weight: 500;
+  color: var(--text-primary);
+  margin: 0;
+  font-family: 'Georgia', 'Times New Roman', serif;
+  letter-spacing: -0.011em;
+  line-height: 1.3;
+  flex: 1;
+  min-width: 0;
+}
+
+.group-meeting-type {
+  padding: 4px 12px;
+  border-radius: 99em;
+  font-size: 12px;
+  font-weight: 500;
+  flex-shrink: 0;
+}
+
+.group-meeting-type.online {
+  background-color: rgba(59, 130, 246, 0.1);
+  color: rgba(59, 130, 246, 0.9);
+}
+
+.group-meeting-type.offline {
+  background-color: rgba(34, 197, 94, 0.1);
+  color: rgba(34, 197, 94, 0.9);
+}
+
+.group-meeting-creator {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--text-tertiary);
+}
+
+.group-meeting-avatar,
+.group-meeting-avatar-img {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.group-meeting-avatar {
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-hover) 100%);
+  color: var(--bg-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 500;
+  font-size: 11px;
+}
+
+.group-meeting-avatar-img {
+  object-fit: cover;
+}
+
+.group-meeting-creator-name {
+  font-size: 13px;
+  color: var(--text-tertiary);
+}
+
+.group-meeting-description {
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0 0 16px 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.group-meeting-details {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border-color);
+}
+
+.group-meeting-detail-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.group-meeting-detail-item svg {
+  flex-shrink: 0;
+  color: var(--text-tertiary);
+}
+
+.group-meeting-link {
+  color: var(--accent);
+  text-decoration: none;
+  word-break: break-all;
+  transition: color 0.2s ease;
+}
+
+.group-meeting-link:hover {
+  color: var(--accent-hover);
+  text-decoration: underline;
+}
+
+.group-meeting-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border-color);
+  justify-content: flex-end;
+}
+
+.group-meeting-action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 6px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  border: none;
+}
+
+.group-meeting-action-btn.edit {
+  background-color: var(--accent);
+  color: var(--bg-primary);
+}
+
+.group-meeting-action-btn.edit:hover {
+  background-color: var(--accent-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px var(--shadow-md);
+}
+
+.group-meeting-action-btn.delete {
+  background-color: transparent;
+  color: rgba(220, 38, 38, 0.8);
+  border: 1px solid rgba(220, 38, 38, 0.3);
+}
+
+.group-meeting-action-btn.delete:hover {
+  background-color: rgba(220, 38, 38, 0.05);
+  border-color: rgba(220, 38, 38, 0.5);
+  color: rgba(220, 38, 38, 1);
+  transform: translateY(-1px);
+}
+
+.group-meeting-action-btn svg {
+  flex-shrink: 0;
+}
+
+/* New Post button in group detail */
+.group-posts-section .new-post-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 7px 20px;
+  border-radius: 99em;
+  font-size: 16px;
+  font-weight: 400;
+  background-color: var(--accent);
+  color: var(--bg-primary);
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px var(--shadow-sm);
+}
+
+[data-theme="dark"] .group-posts-section .new-post-btn {
+  color: var(--bg-primary);
+}
+
+.group-posts-section .new-post-btn:hover {
+  background-color: var(--accent-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px var(--shadow-md);
+}
+
+.group-posts-section .new-post-btn svg {
+  flex-shrink: 0;
+}
+
+@media (max-width: 1024px) {
+  .group-detail-content {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .group-detail-page {
+    padding: 24px 16px;
+  }
+
+  .group-detail-title {
+    font-size: 32px;
+  }
+
+  .group-detail-description {
+    font-size: 18px;
+  }
+
+  .join-group-btn,
+  .leave-group-btn,
+  .manage-group-btn,
+  .delete-group-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .members-grid {
+    grid-template-columns: 1fr;
+  }
+}

@@ -13,12 +13,18 @@ import EditPost from './pages/EditPost'
 import Settings from './pages/Settings'
 import Profile from './pages/Profile'
 import Auth from './pages/Auth'
+import GroupStudy from './pages/GroupStudy'
+import CreateGroup from './pages/CreateGroup'
+import GroupDetail from './pages/GroupDetail'
+import GroupSettings from './pages/GroupSettings'
+import CreateGroupMeeting from './pages/CreateGroupMeeting'
+import EditGroupMeeting from './pages/EditGroupMeeting'
 import NotFound from './pages/NotFound'
 import './App.css'
 
 function AppContent({ user }) {
   const location = useLocation()
-  const hideFooter = location.pathname === '/create' || location.pathname.startsWith('/edit/')
+  const hideFooter = location.pathname === '/create' || location.pathname.startsWith('/edit/') || location.pathname === '/groups/create' || (location.pathname.includes('/groups/') && (location.pathname.includes('/settings') || location.pathname.includes('/meeting/')))
 
   return (
     <div className="app">
@@ -34,6 +40,12 @@ function AppContent({ user }) {
           <Route path="/settings" element={<Settings user={user} />} />
           <Route path="/profile/:slug" element={<Profile user={user} />} />
           <Route path="/profile" element={<Profile user={user} />} />
+          <Route path="/groups" element={<GroupStudy user={user} />} />
+          <Route path="/groups/create" element={<CreateGroup user={user} />} />
+          <Route path="/groups/:groupSlug/meeting/create" element={<CreateGroupMeeting user={user} />} />
+          <Route path="/groups/:groupSlug/meeting/:meetingId/edit" element={<EditGroupMeeting user={user} />} />
+          <Route path="/groups/:groupSlug/settings" element={<GroupSettings user={user} />} />
+          <Route path="/groups/:groupSlug" element={<GroupDetail user={user} />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
