@@ -23,7 +23,8 @@ Deno.serve(async (req) => {
         headers: {
           'Access-Control-Allow-Origin': '*',
           'Access-Control-Allow-Methods': 'POST, OPTIONS',
-          'Access-Control-Allow-Headers': 'content-type',
+          'Access-Control-Allow-Headers': 'Content-Type, Authorization, apikey',
+          'Access-Control-Max-Age': '86400',
         },
       })
     }
@@ -35,7 +36,13 @@ Deno.serve(async (req) => {
     if (!type) {
       return new Response(
         JSON.stringify({ error: 'Type is required' }),
-        { status: 400, headers: { 'Content-Type': 'application/json' } }
+        { 
+          status: 400, 
+          headers: { 
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*',
+          } 
+        }
       )
     }
 
@@ -81,13 +88,18 @@ Deno.serve(async (req) => {
       if (recipients.length === 0) {
         return new Response(
           JSON.stringify({ message: 'No recipients found' }),
-          { status: 200, headers: { 'Content-Type': 'application/json' } }
+          { 
+            status: 200, 
+            headers: { 
+              'Content-Type': 'application/json',
+              'Access-Control-Allow-Origin': '*',
+            } 
+          }
         )
       }
 
       // Construct the frontend URL
       const noteUrl = noteSlug ? `https://qurannerds.netlify.app/note/${noteSlug}` : '#'
-
       
       subject = `New Note: ${noteTitle || 'Untitled'}`
       html = `
@@ -253,7 +265,13 @@ Deno.serve(async (req) => {
       if (!noteId) {
         return new Response(
           JSON.stringify({ error: 'noteId is required for comment notifications' }),
-          { status: 400, headers: { 'Content-Type': 'application/json' } }
+          { 
+            status: 400, 
+            headers: { 
+              'Content-Type': 'application/json',
+              'Access-Control-Allow-Origin': '*',
+            } 
+          }
         )
       }
 
@@ -274,7 +292,13 @@ Deno.serve(async (req) => {
       if (notes.length === 0) {
         return new Response(
           JSON.stringify({ error: 'Note not found' }),
-          { status: 404, headers: { 'Content-Type': 'application/json' } }
+          { 
+            status: 404, 
+            headers: { 
+              'Content-Type': 'application/json',
+              'Access-Control-Allow-Origin': '*',
+            } 
+          }
         )
       }
 
@@ -337,7 +361,13 @@ Deno.serve(async (req) => {
       if (recipients.length === 0) {
         return new Response(
           JSON.stringify({ message: 'No recipients found' }),
-          { status: 200, headers: { 'Content-Type': 'application/json' } }
+          { 
+            status: 200, 
+            headers: { 
+              'Content-Type': 'application/json',
+              'Access-Control-Allow-Origin': '*',
+            } 
+          }
         )
       }
 
@@ -524,7 +554,13 @@ Deno.serve(async (req) => {
     } else {
       return new Response(
         JSON.stringify({ error: 'Invalid type. Must be "note" or "comment"' }),
-        { status: 400, headers: { 'Content-Type': 'application/json' } }
+        { 
+          status: 400, 
+          headers: { 
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*',
+          } 
+        }
       )
     }
 

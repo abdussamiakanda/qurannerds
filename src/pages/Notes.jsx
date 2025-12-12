@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { Heart, Eye, MessageCircle, Search } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { getExcerpt, createNoteSlug, createProfileSlug } from '../utils/textUtils'
 import './Home.css'
 
 function Notes({ user }) {
+  const navigate = useNavigate()
   const [notes, setNotes] = useState([])
   const [filteredNotes, setFilteredNotes] = useState([])
   const [authorProfiles, setAuthorProfiles] = useState({})
@@ -217,13 +218,16 @@ function Notes({ user }) {
                         {authorInitial}
                       </div>
                       <div className="author-info">
-                        <Link 
-                          to={`/profile/${profileSlug}`}
-                          onClick={(e) => e.stopPropagation()}
+                        <span 
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            navigate(`/profile/${profileSlug}`)
+                          }}
                           className="author-name"
+                          style={{ cursor: 'pointer' }}
                         >
                           {authorName}
-                        </Link>
+                        </span>
                         <div className="post-date">{formatDate(note.created_at)}</div>
                       </div>
                     </div>

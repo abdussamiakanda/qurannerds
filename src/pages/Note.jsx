@@ -115,16 +115,23 @@ function Note({ user }) {
     if (!user || !note) return
 
     try {
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from('post_likes')
         .select('id')
         .eq('post_id', note.id)
         .eq('user_id', user.id)
-        .single()
+        .maybeSingle()
+
+      if (error) {
+        console.error('Error checking like status:', error)
+        setIsLiked(false)
+        return
+      }
 
       setIsLiked(!!data)
     } catch (error) {
       // Not liked or error - that's okay
+      console.error('Error checking like status:', error)
       setIsLiked(false)
     }
   }
