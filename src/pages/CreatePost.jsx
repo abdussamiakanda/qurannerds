@@ -81,34 +81,6 @@ function CreatePost({ user }) {
 
       const noteSlug = createNoteSlug(data.title, data.id)
       
-      // Send email notification to all users (fire and forget)
-      try {
-        const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
-        const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
-        
-        fetch(`${supabaseUrl}/functions/v1/send-email`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${supabaseAnonKey}`,
-            'apikey': supabaseAnonKey,
-          },
-          body: JSON.stringify({
-            type: 'note',
-            noteId: data.id,
-            noteTitle: data.title,
-            noteAuthorName: data.author_name || user.user_metadata?.name || user.email?.split('@')[0],
-            noteSlug: noteSlug,
-          }),
-        }).catch(err => {
-          console.error('Error sending email notification:', err)
-          // Don't block navigation if email fails
-        })
-      } catch (emailError) {
-        console.error('Error sending email notification:', emailError)
-        // Don't block navigation if email fails
-      }
-      
       navigate(`/note/${noteSlug}`)
     } catch (error) {
       console.error('Error creating note:', error)

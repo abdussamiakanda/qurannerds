@@ -169,10 +169,14 @@ function Settings({ user }) {
 
       if (authError) throw authError
 
+      // Get current user email
+      const { data: { user: currentUser } } = await supabase.auth.getUser()
+      
       // Upsert profile data
       const profileData = {
         id: user.id,
         name: name.trim(),
+        email: currentUser?.email || email || null,
         bio: bio.trim(),
         avatar_url: avatarUrl.trim() || null,
         location: location.trim() || null,
@@ -188,7 +192,21 @@ function Settings({ user }) {
           onConflict: 'id'
         })
 
-      if (profileError) throw profileError
+      if (profileError) {
+        // If RLS blocks email update, try without email
+        if (profileError.code === '42501' || profileError.message?.includes('permission') || profileError.message?.includes('policy')) {
+          // Retry without email field if RLS blocks it
+          const { email: _, ...profileDataWithoutEmail } = profileData
+          const { error: retryError } = await supabase
+            .from('profiles')
+            .upsert(profileDataWithoutEmail, {
+              onConflict: 'id'
+            })
+          if (retryError) throw retryError
+        } else {
+          throw profileError
+        }
+      }
 
       setMessage('Profile updated successfully!')
       setTimeout(() => setMessage(''), 3000)

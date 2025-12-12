@@ -88,6 +88,7 @@ function Auth() {
         if (error) throw error
 
         if (data.user) {
+          // Profile will be created automatically by database trigger
           setMessage('Account created! Please check your email to verify your account.')
           // Clear form
           setEmail('')

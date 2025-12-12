@@ -37,30 +37,46 @@ function SEO({
       meta.setAttribute('content', content)
     }
 
-    // Basic meta tags
-    const metaDescription = description || 'A platform dedicated to sharing knowledge, insights, and reflections on the Quran. Join our community of learners and scholars.'
-    const metaKeywords = keywords || 'Quran, Islamic studies, Quranic knowledge, Muslim community, Islamic education, Quran study, Tafsir, Hadith'
-    
-    setMetaTag('description', metaDescription)
-    setMetaTag('keywords', metaKeywords)
+    // Basic meta tags - only use provided values, no fallbacks
+    if (description) {
+      setMetaTag('description', description)
+    }
+    if (keywords) {
+      setMetaTag('keywords', keywords)
+    }
     if (author) {
       setMetaTag('author', author)
     }
     
-    // Open Graph tags
-    setMetaTag('og:title', fullTitle, true)
-    setMetaTag('og:description', metaDescription, true)
+    // Open Graph tags - use provided data, only fallback for image
+    if (title) {
+      setMetaTag('og:title', title, true)
+    }
+    if (description) {
+      setMetaTag('og:description', description, true)
+    }
     setMetaTag('og:type', type, true)
     setMetaTag('og:url', currentUrl, true)
-    setMetaTag('og:image', image || defaultImage, true)
+    const ogImage = image || defaultImage
+    setMetaTag('og:image', ogImage, true)
+    if (title) {
+      setMetaTag('og:image:alt', title, true)
+    }
     setMetaTag('og:site_name', 'QuranNerds', true)
     setMetaTag('og:locale', 'en_US', true)
     
     // Twitter Card tags
     setMetaTag('twitter:card', 'summary_large_image')
-    setMetaTag('twitter:title', fullTitle)
-    setMetaTag('twitter:description', metaDescription)
-    setMetaTag('twitter:image', image || defaultImage)
+    if (title) {
+      setMetaTag('twitter:title', title)
+    }
+    if (description) {
+      setMetaTag('twitter:description', description)
+    }
+    setMetaTag('twitter:image', ogImage)
+    if (title) {
+      setMetaTag('twitter:image:alt', title)
+    }
     
     // Article meta tags (for blog posts/notes)
     if (type === 'article') {
@@ -97,7 +113,6 @@ function SEO({
       '@type': type === 'article' ? 'Article' : 'WebSite',
       name: 'QuranNerds',
       url: baseUrl,
-      description: metaDescription,
       publisher: {
         '@type': 'Organization',
         name: 'QuranNerds',
@@ -108,9 +123,15 @@ function SEO({
       }
     }
 
+    if (description) {
+      schema.description = description
+    }
+
     if (type === 'article' && title) {
       schema.headline = title
-      schema.description = metaDescription
+      if (description) {
+        schema.description = description
+      }
       if (author) {
         schema.author = {
           '@type': 'Person',

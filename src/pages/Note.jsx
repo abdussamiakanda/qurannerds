@@ -38,25 +38,6 @@ function Note({ user }) {
     }
   }, [note, user])
 
-  // Log processed content when note changes
-  useEffect(() => {
-    if (note && note.content) {
-      const processedContent = processQuranicContent(note.content)
-      console.log('=== RENDERED CONTENT (PROCESSED) ===')
-      console.log('Processed HTML:', processedContent)
-      console.log('Processed Length:', processedContent?.length || 0)
-      console.log('Difference:', {
-        originalLength: note.content?.length || 0,
-        processedLength: processedContent?.length || 0,
-        changed: note.content !== processedContent
-      })
-      if (note.content !== processedContent) {
-        console.log('Content was modified by processQuranicContent')
-      } else {
-        console.log('Content unchanged after processing')
-      }
-    }
-  }, [note])
 
   useEffect(() => {
     if (!note) return
@@ -370,14 +351,6 @@ function Note({ user }) {
         setLoading(false)
         return
       }
-
-      // Log what database gives
-      console.log('=== DATABASE CONTENT (RAW) ===')
-      console.log('Note ID:', foundNote.id)
-      console.log('Note Title:', foundNote.title)
-      console.log('Note Content (from database):', foundNote.content)
-      console.log('Content Type:', typeof foundNote.content)
-      console.log('Content Length:', foundNote.content?.length || 0)
 
       setNote(foundNote)
       setViewsCount(foundNote.views || 0)
