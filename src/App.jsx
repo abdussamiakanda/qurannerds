@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react'
 import { supabase } from './lib/supabase'
 import { ThemeProvider } from './contexts/ThemeContext'
 import Navbar from './components/Navbar'
+import Footer from './components/Footer'
 import Home from './pages/Home'
 import Notes from './pages/Notes'
 import Note from './pages/Note'
@@ -49,19 +50,22 @@ function App() {
       <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <div className="app">
           <Navbar user={user} />
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/notes" element={<Notes user={user} />} />
-            <Route path="/note/:slug" element={<Note user={user} />} />
-            <Route path="/dashboard" element={<Dashboard user={user} />} />
-            <Route path="/create" element={<CreatePost user={user} />} />
-            <Route path="/edit/:slug" element={<EditPost user={user} />} />
-            <Route path="/settings" element={<Settings user={user} />} />
-            <Route path="/profile/:slug" element={<Profile user={user} />} />
-            <Route path="/profile" element={<Profile user={user} />} />
-            <Route path="/auth" element={<Auth />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
+          <main className="app-main">
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/notes" element={<Notes user={user} />} />
+              <Route path="/note/:slug" element={<Note user={user} />} />
+              <Route path="/dashboard" element={<Dashboard user={user} />} />
+              <Route path="/create" element={<CreatePost user={user} />} />
+              <Route path="/edit/:slug" element={<EditPost user={user} />} />
+              <Route path="/settings" element={<Settings user={user} />} />
+              <Route path="/profile/:slug" element={<Profile user={user} />} />
+              <Route path="/profile" element={<Profile user={user} />} />
+              <Route path="/auth" element={<Auth />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </main>
+          <Footer />
         </div>
       </Router>
     </ThemeProvider>

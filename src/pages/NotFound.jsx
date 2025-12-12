@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { Home, BookOpen, ArrowLeft } from 'lucide-react'
+import { Home, ArrowLeft } from 'lucide-react'
 import LogoIcon from '../components/LogoIcon'
 import './NotFound.css'
 
@@ -32,22 +32,6 @@ function NotFound() {
               <ArrowLeft size={20} />
               <span>Go Back</span>
             </button>
-          </div>
-          
-          <div className="not-found-links">
-            <p className="not-found-links-title">Popular Pages:</p>
-            <div className="not-found-links-grid">
-              <Link to="/" className="not-found-link">
-                <BookOpen size={18} />
-                <span>Home</span>
-              </Link>
-              <Link to="/about" className="not-found-link">
-                <span>About</span>
-              </Link>
-              <Link to="/auth" className="not-found-link">
-                <span>Sign In</span>
-              </Link>
-            </div>
           </div>
         </div>
       </div>

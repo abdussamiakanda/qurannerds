@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
-import { MapPin, Globe, Twitter } from 'lucide-react'
+import { MapPin, Globe, Twitter, Home, Users } from 'lucide-react'
 import { supabase } from '../lib/supabase'
+import LogoIcon from '../components/LogoIcon'
 import { getExcerpt, createProfileSlug, createNoteSlug } from '../utils/textUtils'
 import './Profile.css'
 
@@ -155,8 +156,32 @@ function Profile({ user }) {
   if (!profile) {
     return (
       <div className="profile-not-found">
-        <h2>Profile not found</h2>
-        <Link to="/">Go back home</Link>
+        <div className="profile-not-found-container">
+          <div className="profile-not-found-content">
+            <div className="profile-not-found-icon-wrapper">
+              <LogoIcon size={64} className="profile-not-found-icon" />
+            </div>
+            
+            <h2 className="profile-not-found-title">Profile Not Found</h2>
+            
+            <p className="profile-not-found-text">
+              The profile you're looking for doesn't exist or has been removed. 
+              Let's get you back on track.
+            </p>
+            
+            <div className="profile-not-found-actions">
+              <Link to="/" className="profile-not-found-button primary">
+                <Home size={20} />
+                <span>Go Home</span>
+              </Link>
+              
+              <Link to="/notes" className="profile-not-found-button secondary">
+                <Users size={20} />
+                <span>Browse Notes</span>
+              </Link>
+            </div>
+          </div>
+        </div>
       </div>
     )
   }

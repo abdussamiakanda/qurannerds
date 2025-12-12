@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
-import { Heart, Eye, MessageCircle } from 'lucide-react'
+import { Heart, Eye, MessageCircle, Home, BookOpen } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import Comments from '../components/Comments'
+import LogoIcon from '../components/LogoIcon'
 import { processQuranicContent, extractIdFromSlug, createProfileSlug } from '../utils/textUtils'
 import './Note.css'
 
@@ -209,8 +210,32 @@ function Note({ user }) {
   if (!note) {
     return (
       <div className="post-not-found">
-        <h2>Note not found</h2>
-        <Link to="/">Go back home</Link>
+        <div className="post-not-found-container">
+          <div className="post-not-found-content">
+            <div className="post-not-found-icon-wrapper">
+              <LogoIcon size={64} className="post-not-found-icon" />
+            </div>
+            
+            <h2 className="post-not-found-title">Note Not Found</h2>
+            
+            <p className="post-not-found-text">
+              The note you're looking for doesn't exist or has been removed. 
+              Let's get you back on track.
+            </p>
+            
+            <div className="post-not-found-actions">
+              <Link to="/" className="post-not-found-button primary">
+                <Home size={20} />
+                <span>Go Home</span>
+              </Link>
+              
+              <Link to="/notes" className="post-not-found-button secondary">
+                <BookOpen size={20} />
+                <span>Browse Notes</span>
+              </Link>
+            </div>
+          </div>
+        </div>
       </div>
     )
   }

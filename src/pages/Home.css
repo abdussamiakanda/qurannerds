@@ -122,7 +122,7 @@
 .home-about {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 100px 24px;
+  padding: 100px 24px 0 24px;
 }
 
 .home-about-container {
