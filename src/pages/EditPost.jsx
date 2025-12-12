@@ -1,38 +1,66 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
+import { extractIdFromSlug, createNoteSlug } from '../utils/textUtils'
 import RichTextEditor from '../components/RichTextEditor'
 import './EditPost.css'
 
 function EditPost({ user }) {
-  const { id } = useParams()
+  const { slug } = useParams()
   const navigate = useNavigate()
   const [title, setTitle] = useState('')
   const [content, setContent] = useState('')
+  const [noteId, setNoteId] = useState(null)
+  const [originalTitle, setOriginalTitle] = useState('')
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
+  const [titleError, setTitleError] = useState('')
 
   useEffect(() => {
     fetchPost()
-  }, [id])
+  }, [slug])
 
   const fetchPost = async () => {
     try {
+      // Extract last 4 digits from slug
+      const idSuffix = extractIdFromSlug(slug)
+      if (!idSuffix) {
+        setLoading(false)
+        return
+      }
+
+      // Fetch all posts and find matching one
       const { data, error } = await supabase
         .from('posts')
         .select('*')
-        .eq('id', id)
-        .single()
+        .order('created_at', { ascending: false })
 
       if (error) throw error
 
-      if (data.author_id !== user?.id) {
+      // Find note where ID ends with the suffix
+      const foundNote = data?.find(post => {
+        const postIdSuffix = post.id.slice(-4)
+        return postIdSuffix === idSuffix
+      })
+
+      if (!foundNote) {
+        setLoading(false)
+        return
+      }
+
+      const id = foundNote.id
+      setNoteId(id)
+
+      if (error) throw error
+
+      if (foundNote.author_id !== user?.id) {
         navigate('/')
         return
       }
 
-      setTitle(data.title)
-      setContent(data.content)
+      setTitle(foundNote.title)
+      setOriginalTitle(foundNote.title)
+      setContent(foundNote.content)
     } catch (error) {
       console.error('Error fetching note:', error)
       navigate('/')
@@ -41,12 +69,38 @@ function EditPost({ user }) {
     }
   }
 
+  const checkTitleUnique = async (titleToCheck, excludeId) => {
+    const { data, error } = await supabase
+      .from('posts')
+      .select('id')
+      .eq('title', titleToCheck.trim())
+      .neq('id', excludeId)
+      .maybeSingle()
+
+    if (error) {
+      console.error('Error checking title:', error)
+      return true // Allow if check fails
+    }
+
+    return !data // Return true if no note with this title exists
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault()
+    setTitleError('')
     
     if (!title.trim() || !content.trim()) {
       alert('Please fill in both title and content')
       return
+    }
+
+    // Only check uniqueness if title has changed
+    if (title.trim() !== originalTitle.trim()) {
+      const isUnique = await checkTitleUnique(title.trim(), noteId)
+      if (!isUnique) {
+        setTitleError('A note with this title already exists. Please choose a different title.')
+        return
+      }
     }
 
     setSaving(true)
@@ -59,11 +113,12 @@ function EditPost({ user }) {
           content: content.trim(),
           updated_at: new Date().toISOString()
         })
-        .eq('id', id)
+        .eq('id', noteId)
 
       if (error) throw error
 
-      navigate(`/note/${id}`)
+      const noteSlug = createNoteSlug(title.trim(), noteId)
+      navigate(`/note/${noteSlug}`)
     } catch (error) {
       console.error('Error updating note:', error)
       alert('Failed to update note. Please try again.')
@@ -102,10 +157,16 @@ function EditPost({ user }) {
               type="text"
               placeholder="Note Title"
               value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              className="title-input"
+              onChange={(e) => {
+                setTitle(e.target.value)
+                setTitleError('')
+              }}
+              className={`title-input ${titleError ? 'error' : ''}`}
               maxLength={200}
             />
+            {titleError && (
+              <div className="form-error">{titleError}</div>
+            )}
           </div>
           
           <div className="form-group">
@@ -120,7 +181,14 @@ function EditPost({ user }) {
             <div className="form-actions-inner">
               <button
                 type="button"
-                onClick={() => navigate(`/note/${id}`)}
+                onClick={() => {
+                  if (noteId) {
+                    const noteSlug = createNoteSlug(title, noteId)
+                    navigate(`/note/${noteSlug}`)
+                  } else {
+                    navigate('/notes')
+                  }
+                }}
                 className="cancel-btn"
                 disabled={saving}
               >

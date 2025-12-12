@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { Heart, Eye, MessageCircle, Search } from 'lucide-react'
 import { supabase } from '../lib/supabase'
-import { getExcerpt } from '../utils/textUtils'
+import { getExcerpt, createNoteSlug, createProfileSlug } from '../utils/textUtils'
 import './Home.css'
 
 function Notes({ user }) {
@@ -192,8 +192,11 @@ function Notes({ user }) {
               const authorInitial = authorName.charAt(0).toUpperCase()
               const stats = notesStats[note.id] || { likes: 0, comments: 0, views: 0 }
 
+              const noteSlug = createNoteSlug(note.title, note.id)
+              const profileSlug = createProfileSlug(authorName)
+              
               return (
-                <Link key={note.id} to={`/note/${note.id}`} className="post-card">
+                <Link key={note.id} to={`/note/${noteSlug}`} className="post-card">
                   <div className="post-card-header">
                     <div className="post-author">
                       {authorAvatar && authorAvatar.trim() ? (
@@ -214,9 +217,13 @@ function Notes({ user }) {
                         {authorInitial}
                       </div>
                       <div className="author-info">
-                        <div className="author-name">
+                        <Link 
+                          to={`/profile/${profileSlug}`}
+                          onClick={(e) => e.stopPropagation()}
+                          className="author-name"
+                        >
                           {authorName}
-                        </div>
+                        </Link>
                         <div className="post-date">{formatDate(note.created_at)}</div>
                       </div>
                     </div>

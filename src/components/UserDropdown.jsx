@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
+import { createProfileSlug } from '../utils/textUtils'
 import './UserDropdown.css'
 
 function UserDropdown({ user }) {
@@ -126,7 +127,7 @@ function UserDropdown({ user }) {
           
           <div className="dropdown-divider"></div>
 
-          <Link to={`/profile/${user?.id}`} className="dropdown-item" onClick={() => setIsOpen(false)}>
+          <Link to={`/profile/${createProfileSlug(userName || user?.user_metadata?.name || user?.email?.split('@')[0] || 'user')}`} className="dropdown-item" onClick={() => setIsOpen(false)}>
             <span>Profile</span>
           </Link>
 

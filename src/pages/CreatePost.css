@@ -87,10 +87,25 @@
   border-bottom-width: 2px;
 }
 
+.title-input.error {
+  border-bottom-color: #ef4444;
+}
+
+.title-input.error:focus {
+  border-bottom-color: #ef4444;
+}
+
 .title-input::placeholder {
   color: var(--text-tertiary);
   font-weight: 400;
   opacity: 0.6;
+}
+
+.form-error {
+  color: #ef4444;
+  font-size: 14px;
+  margin-top: 8px;
+  padding-left: 4px;
 }
 
 .content-textarea {

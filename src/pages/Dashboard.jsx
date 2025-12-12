@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
-import { getExcerpt } from '../utils/textUtils'
+import { getExcerpt, createNoteSlug } from '../utils/textUtils'
 import './Dashboard.css'
 
 function Dashboard({ user }) {
@@ -89,10 +89,12 @@ function Dashboard({ user }) {
           </div>
         ) : (
           <div className="dashboard-posts">
-            {posts.map((post) => (
+            {posts.map((post) => {
+              const noteSlug = createNoteSlug(post.title, post.id)
+              return (
               <div key={post.id} className="dashboard-post-card">
                 <div className="post-card-main">
-                  <Link to={`/note/${post.id}`} className="post-card-link">
+                  <Link to={`/note/${noteSlug}`} className="post-card-link">
                     <h2 className="post-card-title">{post.title}</h2>
                     <p className="post-card-excerpt">
                       {getExcerpt(post.content, 200)}
@@ -106,7 +108,7 @@ function Dashboard({ user }) {
                   </div>
                 </div>
                 <div className="post-card-actions">
-                  <Link to={`/edit/${post.id}`} className="action-btn edit-btn">
+                  <Link to={`/edit/${noteSlug}`} className="action-btn edit-btn">
                     Edit
                   </Link>
                   <button
@@ -117,7 +119,8 @@ function Dashboard({ user }) {
                   </button>
                 </div>
               </div>
-            ))}
+              )
+            })}
           </div>
         )}
       </div>

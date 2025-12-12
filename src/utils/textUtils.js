@@ -263,3 +263,56 @@ function buildVerseHTML(verse, parts) {
   return html
 }
 
+/**
+ * Creates a URL-friendly slug from a title
+ * @param {string} title - Title to convert to slug
+ * @returns {string} URL-friendly slug
+ */
+export function createSlug(text) {
+  if (!text) return ''
+  return text
+    .toLowerCase()
+    .trim()
+    .replace(/[^\w\s-]/g, '') // Remove special characters
+    .replace(/[\s_-]+/g, '-') // Replace spaces and underscores with hyphens
+    .replace(/^-+|-+$/g, '') // Remove leading/trailing hyphens
+}
+
+/**
+ * Creates a slug for a note: title + last 4 digits of ID
+ * @param {string} title - Note title
+ * @param {string} id - Note ID (UUID)
+ * @returns {string} Slug like "my-note-title-1234"
+ */
+export function createNoteSlug(title, id) {
+  const titleSlug = createSlug(title)
+  const lastFour = id ? id.slice(-4) : ''
+  return titleSlug ? `${titleSlug}-${lastFour}` : lastFour
+}
+
+/**
+ * Extracts the ID from a note slug
+ * @param {string} slug - Note slug
+ * @returns {string} Last 4 digits of ID
+ */
+export function extractIdFromSlug(slug) {
+  if (!slug) return null
+  const parts = slug.split('-')
+  const lastPart = parts[parts.length - 1]
+  // Check if last part is 4 characters (likely the ID suffix)
+  if (lastPart && lastPart.length === 4 && /^[a-f0-9]{4}$/i.test(lastPart)) {
+    return lastPart
+  }
+  return null
+}
+
+/**
+ * Creates a slug for a user profile from name
+ * @param {string} name - User name
+ * @returns {string} Slug like "john-doe"
+ */
+export function createProfileSlug(name) {
+  if (!name) return ''
+  return createSlug(name)
+}
+

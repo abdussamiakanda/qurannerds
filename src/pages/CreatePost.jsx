@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
+import { createNoteSlug } from '../utils/textUtils'
 import RichTextEditor from '../components/RichTextEditor'
 import './CreatePost.css'
 
@@ -9,6 +10,7 @@ function CreatePost({ user }) {
   const [title, setTitle] = useState('')
   const [content, setContent] = useState('')
   const [loading, setLoading] = useState(false)
+  const [titleError, setTitleError] = useState('')
 
   if (!user) {
     return (
@@ -22,11 +24,34 @@ function CreatePost({ user }) {
     )
   }
 
+  const checkTitleUnique = async (titleToCheck) => {
+    const { data, error } = await supabase
+      .from('posts')
+      .select('id')
+      .eq('title', titleToCheck.trim())
+      .maybeSingle()
+
+    if (error) {
+      console.error('Error checking title:', error)
+      return true // Allow if check fails
+    }
+
+    return !data // Return true if no note with this title exists
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault()
+    setTitleError('')
     
     if (!title.trim() || !content.trim()) {
       alert('Please fill in both title and content')
+      return
+    }
+
+    // Check if title is unique
+    const isUnique = await checkTitleUnique(title.trim())
+    if (!isUnique) {
+      setTitleError('A note with this title already exists. Please choose a different title.')
       return
     }
 
@@ -49,7 +74,8 @@ function CreatePost({ user }) {
 
       if (error) throw error
 
-      navigate(`/note/${data.id}`)
+      const noteSlug = createNoteSlug(data.title, data.id)
+      navigate(`/note/${noteSlug}`)
     } catch (error) {
       console.error('Error creating note:', error)
       alert('Failed to create note. Please try again.')
@@ -68,10 +94,16 @@ function CreatePost({ user }) {
               type="text"
               placeholder="Note Title"
               value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              className="title-input"
+              onChange={(e) => {
+                setTitle(e.target.value)
+                setTitleError('')
+              }}
+              className={`title-input ${titleError ? 'error' : ''}`}
               maxLength={200}
             />
+            {titleError && (
+              <div className="form-error">{titleError}</div>
+            )}
           </div>
           
           <div className="form-group">

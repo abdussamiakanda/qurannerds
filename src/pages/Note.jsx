@@ -3,11 +3,11 @@ import { useParams, useNavigate, Link } from 'react-router-dom'
 import { Heart, Eye, MessageCircle } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import Comments from '../components/Comments'
-import { processQuranicContent } from '../utils/textUtils'
+import { processQuranicContent, extractIdFromSlug, createProfileSlug } from '../utils/textUtils'
 import './Note.css'
 
 function Note({ user }) {
-  const { id } = useParams()
+  const { slug } = useParams()
   const navigate = useNavigate()
   const [note, setNote] = useState(null)
   const [authorProfile, setAuthorProfile] = useState(null)
@@ -19,8 +19,13 @@ function Note({ user }) {
 
   useEffect(() => {
     fetchNote()
-    incrementViews()
-  }, [id])
+  }, [slug])
+
+  useEffect(() => {
+    if (note) {
+      incrementViews()
+    }
+  }, [note])
 
   useEffect(() => {
     if (note && user) {
@@ -30,22 +35,41 @@ function Note({ user }) {
 
   const fetchNote = async () => {
     try {
+      // Extract last 4 digits from slug
+      const idSuffix = extractIdFromSlug(slug)
+      if (!idSuffix) {
+        setLoading(false)
+        return
+      }
+
+      // Fetch all posts and filter by matching slug and ID suffix
       const { data, error } = await supabase
         .from('posts')
         .select('*')
-        .eq('id', id)
-        .single()
+        .order('created_at', { ascending: false })
 
       if (error) throw error
-      setNote(data)
-      setViewsCount(data.views || 0)
+
+      // Find note where ID ends with the suffix and slug matches
+      const foundNote = data?.find(post => {
+        const postIdSuffix = post.id.slice(-4)
+        return postIdSuffix === idSuffix
+      })
+
+      if (!foundNote) {
+        setLoading(false)
+        return
+      }
+
+      setNote(foundNote)
+      setViewsCount(foundNote.views || 0)
 
       // Fetch author profile
-      if (data?.author_id) {
+      if (foundNote?.author_id) {
         const { data: profile } = await supabase
           .from('profiles')
           .select('avatar_url, name')
-          .eq('id', data.author_id)
+          .eq('id', foundNote.author_id)
           .single()
 
         if (profile) {
@@ -57,7 +81,7 @@ function Note({ user }) {
       const { count } = await supabase
         .from('post_likes')
         .select('*', { count: 'exact', head: true })
-        .eq('post_id', id)
+        .eq('post_id', foundNote.id)
 
       setLikesCount(count || 0)
     } catch (error) {
@@ -68,13 +92,14 @@ function Note({ user }) {
   }
 
   const incrementViews = async () => {
+    if (!note) return
     try {
-      await supabase.rpc('increment_post_views', { post_uuid: id })
+      await supabase.rpc('increment_post_views', { post_uuid: note.id })
       // Refresh views count
       const { data } = await supabase
         .from('posts')
         .select('views')
-        .eq('id', id)
+        .eq('id', note.id)
         .single()
       
       if (data) {
@@ -154,10 +179,10 @@ function Note({ user }) {
       const { error } = await supabase
         .from('posts')
         .delete()
-        .eq('id', id)
+        .eq('id', note.id)
 
       if (error) throw error
-      navigate('/')
+      navigate('/notes')
     } catch (error) {
       console.error('Error deleting note:', error)
       alert('Failed to delete note')
@@ -199,7 +224,7 @@ function Note({ user }) {
           <h1 className="post-title">{note.title}</h1>
           <div className="post-meta">
             <Link 
-              to={`/profile/${note.author_id}`} 
+              to={`/profile/${createProfileSlug(authorProfile?.name || note.author_name || note.author_email || 'user')}`} 
               className="post-author-info"
             >
               {authorProfile?.avatar_url && authorProfile.avatar_url.trim() ? (
@@ -228,7 +253,7 @@ function Note({ user }) {
             </Link>
             {isAuthor && (
               <div className="post-actions">
-                <Link to={`/edit/${note.id}`} className="edit-btn">
+                <Link to={`/edit/${slug}`} className="edit-btn">
                   Edit
                 </Link>
                 <button onClick={handleDelete} className="delete-btn">

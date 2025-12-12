@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
+import { createProfileSlug } from '../utils/textUtils'
 import { MessageCircle, Trash2, Edit2 } from 'lucide-react'
 import './Comments.css'
 
@@ -187,7 +188,7 @@ function Comments({ postId, user }) {
             return (
               <div key={comment.id} className="comment-item">
                 <Link 
-                  to={`/profile/${comment.user_id}`}
+                  to={`/profile/${createProfileSlug(profile?.name || comment.author_name || comment.author_email || 'user')}`}
                   className="comment-avatar-link"
                 >
                   <div className="comment-avatar">
@@ -212,7 +213,7 @@ function Comments({ postId, user }) {
                 <div className="comment-content-wrapper">
                   <div className="comment-header">
                     <Link 
-                      to={`/profile/${comment.user_id}`}
+                      to={`/profile/${createProfileSlug(profile?.name || comment.author_name || comment.author_email || 'user')}`}
                       className="comment-author-name"
                     >
                       {profile?.name || 'Anonymous'}

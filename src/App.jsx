@@ -52,12 +52,12 @@ function App() {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/notes" element={<Notes user={user} />} />
-            <Route path="/note/:id" element={<Note user={user} />} />
+            <Route path="/note/:slug" element={<Note user={user} />} />
             <Route path="/dashboard" element={<Dashboard user={user} />} />
             <Route path="/create" element={<CreatePost user={user} />} />
-            <Route path="/edit/:id" element={<EditPost user={user} />} />
+            <Route path="/edit/:slug" element={<EditPost user={user} />} />
             <Route path="/settings" element={<Settings user={user} />} />
-            <Route path="/profile/:userId" element={<Profile user={user} />} />
+            <Route path="/profile/:slug" element={<Profile user={user} />} />
             <Route path="/profile" element={<Profile user={user} />} />
             <Route path="/auth" element={<Auth />} />
             <Route path="*" element={<NotFound />} />

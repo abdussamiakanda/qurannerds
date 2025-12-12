@@ -2,27 +2,70 @@ import { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { MapPin, Globe, Twitter } from 'lucide-react'
 import { supabase } from '../lib/supabase'
-import { getExcerpt } from '../utils/textUtils'
+import { getExcerpt, createProfileSlug, createNoteSlug } from '../utils/textUtils'
 import './Profile.css'
 
 function Profile({ user }) {
-  const { userId } = useParams()
+  const { slug } = useParams()
   const [profile, setProfile] = useState(null)
   const [posts, setPosts] = useState([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     fetchProfile()
-  }, [userId])
+  }, [slug, user])
 
   const fetchProfile = async () => {
     try {
-      const targetUserId = userId || user?.id
-      if (!targetUserId) {
+      // If no slug and user is logged in, show their own profile
+      if (!slug && user?.id) {
+        const targetUserId = user.id
+        await fetchProfileById(targetUserId)
+        return
+      }
+
+      if (!slug) {
         setLoading(false)
         return
       }
 
+      // Fetch all profiles and find one matching the slug
+      const { data: profiles, error: profileError } = await supabase
+        .from('profiles')
+        .select('*')
+
+      if (profileError) {
+        console.error('Error fetching profiles:', profileError)
+        setLoading(false)
+        return
+      }
+
+      // Find profile where name slug matches
+      const foundProfile = profiles?.find(p => {
+        const profileSlug = createProfileSlug(p.name || p.email?.split('@')[0] || 'user')
+        return profileSlug === slug
+      })
+
+      if (foundProfile) {
+        await fetchProfileById(foundProfile.id)
+      } else {
+        // If not found by slug, try to find by ID (for backward compatibility)
+        // Check if slug is a UUID
+        const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+        if (uuidRegex.test(slug)) {
+          await fetchProfileById(slug)
+        } else {
+          setLoading(false)
+        }
+      }
+    } catch (error) {
+      console.error('Error loading profile:', error)
+      setLoading(false)
+    }
+  }
+
+  const fetchProfileById = async (targetUserId) => {
+    try {
       // Fetch profile
       const { data: profileData, error: profileError } = await supabase
         .from('profiles')
@@ -199,8 +242,10 @@ function Profile({ user }) {
             </div>
           ) : (
             <div className="profile-posts-grid">
-              {posts.map((post) => (
-                <Link key={post.id} to={`/note/${post.id}`} className="profile-post-card">
+              {posts.map((post) => {
+                const noteSlug = createNoteSlug(post.title, post.id)
+                return (
+                <Link key={post.id} to={`/note/${noteSlug}`} className="profile-post-card">
                   <h3 className="profile-post-title">{post.title}</h3>
                   <p className="profile-post-excerpt">
                     {getExcerpt(post.content, 150)}
@@ -209,7 +254,8 @@ function Profile({ user }) {
                     {formatDate(post.created_at)}
                   </div>
                 </Link>
-              ))}
+                )
+              })}
             </div>
           )}
         </div>
