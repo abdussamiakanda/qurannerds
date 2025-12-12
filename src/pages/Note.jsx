@@ -1,10 +1,10 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import { Heart, Eye, MessageCircle, Home, BookOpen } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import Comments from '../components/Comments'
 import LogoIcon from '../components/LogoIcon'
-import { processQuranicContent, extractIdFromSlug, createProfileSlug } from '../utils/textUtils'
+import { processQuranicContent, extractIdFromSlug, createProfileSlug, getAudioUrl, parseVerseReference } from '../utils/textUtils'
 import './Note.css'
 
 function Note({ user }) {
@@ -17,6 +17,8 @@ function Note({ user }) {
   const [viewsCount, setViewsCount] = useState(0)
   const [loading, setLoading] = useState(true)
   const [liking, setLiking] = useState(false)
+  const audioRef = useRef(null)
+  const currentPlayingBtn = useRef(null)
 
   useEffect(() => {
     fetchNote()
@@ -33,6 +35,291 @@ function Note({ user }) {
       checkIfLiked()
     }
   }, [note, user])
+
+  useEffect(() => {
+    if (!note) return
+
+    // Audio click handler
+    const handleAudioClick = async (e) => {
+      const btn = e.currentTarget || e.target.closest('.verse-audio-btn')
+      
+      if (!btn) return
+      
+      const surah = parseInt(btn.dataset.surah)
+      const startAyah = parseInt(btn.dataset.startAyah)
+      const endAyah = parseInt(btn.dataset.endAyah)
+
+      if (!surah || !startAyah) return
+
+      // If clicking the same button, toggle play/pause
+      if (currentPlayingBtn.current === btn && audioRef.current) {
+        if (audioRef.current.paused) {
+          audioRef.current.play()
+          btn.querySelector('.play-icon').style.display = 'none'
+          btn.querySelector('.pause-icon').style.display = 'block'
+        } else {
+          audioRef.current.pause()
+          btn.querySelector('.play-icon').style.display = 'block'
+          btn.querySelector('.pause-icon').style.display = 'none'
+        }
+        return
+      }
+
+      // Stop any currently playing audio
+      if (audioRef.current) {
+        audioRef.current.pause()
+        audioRef.current = null
+      }
+      if (currentPlayingBtn.current) {
+        currentPlayingBtn.current.querySelector('.play-icon').style.display = 'block'
+        currentPlayingBtn.current.querySelector('.pause-icon').style.display = 'none'
+      }
+
+      // Create new audio element
+      const audio = new Audio()
+      audioRef.current = audio
+      currentPlayingBtn.current = btn
+
+      // Update button state
+      btn.querySelector('.play-icon').style.display = 'none'
+      btn.querySelector('.pause-icon').style.display = 'block'
+
+      try {
+        // For range, play from start to end (e.g., "Al-Faatiha 1-5")
+        if (endAyah > startAyah) {
+          // Play multiple ayahs sequentially
+          let currentAyah = startAyah
+          const playNextAyah = async () => {
+            if (currentAyah > endAyah) {
+              // Finished playing all ayahs
+              btn.querySelector('.play-icon').style.display = 'block'
+              btn.querySelector('.pause-icon').style.display = 'none'
+              audioRef.current = null
+              currentPlayingBtn.current = null
+              return
+            }
+
+            const audioApiUrl = getAudioUrl(surah, currentAyah)
+            try {
+              const response = await fetch(audioApiUrl)
+              if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`)
+              }
+              const data = await response.json()
+              
+              // Al-Quran Cloud API returns: { code: 200, data: { audio: "url", audioSecondary: ["url1", "url2"] } }
+              const audioFileUrl = data?.data?.audio || 
+                                   data?.data?.audioSecondary?.[0]
+              
+              if (audioFileUrl) {
+                audio.src = audioFileUrl
+                audio.onended = () => {
+                  currentAyah++
+                  playNextAyah()
+                }
+                audio.onerror = () => {
+                  currentAyah++
+                  playNextAyah()
+                }
+                await audio.play()
+              } else {
+                currentAyah++
+                playNextAyah()
+              }
+            } catch (fetchError) {
+              currentAyah++
+              playNextAyah()
+            }
+          }
+          playNextAyah()
+        } else {
+          // Single ayah
+          const audioApiUrl = getAudioUrl(surah, startAyah)
+          const response = await fetch(audioApiUrl)
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`)
+          }
+          const data = await response.json()
+          
+          // Al-Quran Cloud API returns: { code: 200, data: { audio: "url", audioSecondary: ["url1", "url2"] } }
+          const audioFileUrl = data?.data?.audio || 
+                               data?.data?.audioSecondary?.[0]
+          
+          if (audioFileUrl) {
+            audio.src = audioFileUrl
+            audio.onended = () => {
+              btn.querySelector('.play-icon').style.display = 'block'
+              btn.querySelector('.pause-icon').style.display = 'none'
+              audioRef.current = null
+              currentPlayingBtn.current = null
+            }
+            audio.onerror = () => {
+              btn.querySelector('.play-icon').style.display = 'block'
+              btn.querySelector('.pause-icon').style.display = 'none'
+              audioRef.current = null
+              currentPlayingBtn.current = null
+            }
+            await audio.play()
+          } else {
+            btn.querySelector('.play-icon').style.display = 'block'
+            btn.querySelector('.pause-icon').style.display = 'none'
+            audioRef.current = null
+            currentPlayingBtn.current = null
+          }
+        }
+      } catch (error) {
+        btn.querySelector('.play-icon').style.display = 'block'
+        btn.querySelector('.pause-icon').style.display = 'none'
+        audioRef.current = null
+        currentPlayingBtn.current = null
+      }
+    }
+
+    // Parse verse references and add audio buttons dynamically
+    const addAudioButtons = async () => {
+      const postContent = document.querySelector('.post-content')
+      if (!postContent) {
+        setTimeout(addAudioButtons, 200)
+        return
+      }
+      
+      const verseHeaders = document.querySelectorAll('.post-content .verse-header[data-verse-reference]')
+      
+      for (const header of verseHeaders) {
+        // Skip if button already exists
+        if (header.querySelector('.verse-audio-btn')) {
+          continue
+        }
+        
+        const reference = header.getAttribute('data-verse-reference')
+        if (!reference) continue
+        
+        try {
+          const verseData = await parseVerseReference(reference)
+          if (verseData) {
+            const audioBtn = document.createElement('button')
+            audioBtn.className = 'verse-audio-btn'
+            audioBtn.setAttribute('data-surah', verseData.surah)
+            audioBtn.setAttribute('data-start-ayah', verseData.startAyah)
+            audioBtn.setAttribute('data-end-ayah', verseData.endAyah)
+            audioBtn.setAttribute('aria-label', 'Play audio')
+            audioBtn.innerHTML = `
+              <svg class="audio-icon play-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="pointer-events: none;">
+                <polygon points="5 3 19 12 5 21 5 3"/>
+              </svg>
+              <svg class="audio-icon pause-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: none; pointer-events: none;">
+                <rect x="6" y="4" width="4" height="16"/>
+                <rect x="14" y="4" width="4" height="16"/>
+              </svg>
+            `
+            
+            header.appendChild(audioBtn)
+            
+            // Add click handler with event propagation prevention
+            const clickHandler = (e) => {
+              e.preventDefault()
+              e.stopPropagation()
+              e.stopImmediatePropagation()
+              handleAudioClick(e)
+            }
+            
+            audioBtn.addEventListener('click', clickHandler, true)
+          }
+        } catch (error) {
+          // Silently fail - button won't be added if parsing fails
+        }
+      }
+    }
+    
+    // Wait for DOM to be ready, then add buttons
+    // Use multiple strategies to ensure buttons are added
+    let checkInterval = null
+    let observer = null
+    let timeouts = []
+    
+    const checkAndAddButtons = () => {
+      const verseHeaders = document.querySelectorAll('.post-content .verse-header[data-verse-reference]')
+      const headersWithoutButtons = Array.from(verseHeaders).filter(header => !header.querySelector('.verse-audio-btn'))
+      
+      if (headersWithoutButtons.length > 0) {
+        addAudioButtons()
+      }
+    }
+    
+    const postContentContainer = document.querySelector('.post-content')
+    
+    if (postContentContainer) {
+      // Strategy 1: MutationObserver to watch for content changes
+      observer = new MutationObserver(() => {
+        checkAndAddButtons()
+      })
+      
+      observer.observe(postContentContainer, {
+        childList: true,
+        subtree: true,
+        attributes: false,
+        characterData: false
+      })
+      
+      // Strategy 2: Periodic checks as fallback
+      checkInterval = setInterval(() => {
+        checkAndAddButtons()
+      }, 500)
+      
+      // Strategy 3: Immediate and delayed checks
+      timeouts.push(setTimeout(checkAndAddButtons, 50))
+      timeouts.push(setTimeout(checkAndAddButtons, 200))
+      timeouts.push(setTimeout(checkAndAddButtons, 500))
+      timeouts.push(setTimeout(checkAndAddButtons, 1000))
+      timeouts.push(setTimeout(checkAndAddButtons, 2000))
+      
+      return () => {
+        if (observer) observer.disconnect()
+        if (checkInterval) clearInterval(checkInterval)
+        timeouts.forEach(timeout => clearTimeout(timeout))
+        const audioButtons = document.querySelectorAll('.verse-audio-btn')
+        audioButtons.forEach(btn => {
+          btn.removeEventListener('click', handleAudioClick)
+        })
+        if (audioRef.current) {
+          audioRef.current.pause()
+          audioRef.current = null
+        }
+      }
+    } else {
+      // If container doesn't exist yet, retry with exponential backoff
+      let attempts = 0
+      const maxAttempts = 10
+      
+      const retryCheck = () => {
+        attempts++
+        const container = document.querySelector('.post-content')
+        if (container) {
+          // Container found, set up observers
+          const verseHeaders = document.querySelectorAll('.post-content .verse-header[data-verse-reference]')
+          if (verseHeaders.length > 0) {
+            addAudioButtons()
+          }
+        } else if (attempts < maxAttempts) {
+          timeouts.push(setTimeout(retryCheck, 200 * attempts))
+        }
+      }
+      
+      timeouts.push(setTimeout(retryCheck, 100))
+      
+      return () => {
+        timeouts.forEach(timeout => clearTimeout(timeout))
+        const audioButtons = document.querySelectorAll('.verse-audio-btn')
+        audioButtons.forEach(btn => {
+          btn.removeEventListener('click', handleAudioClick)
+        })
+        if (audioRef.current) {
+          audioRef.current.pause()
+          audioRef.current = null
+        }
+      }
+    }
+  }, [note])
 
   const fetchNote = async () => {
     try {

@@ -225,6 +225,158 @@ export function processQuranicContent(html) {
   }
 }
 
+// Cache for surah data from Al-Quran Cloud API
+let surahCache = null
+let surahCachePromise = null
+
+/**
+ * Fetches all surahs from Al-Quran Cloud API and caches them
+ * Uses the same API as the editor (api.alquran.cloud)
+ * @returns {Promise<Object>} Promise that resolves to surah map { name: number }
+ */
+async function fetchSurahMap() {
+  if (surahCache) {
+    return surahCache
+  }
+
+  if (surahCachePromise) {
+    return surahCachePromise
+  }
+
+  surahCachePromise = fetch('https://api.alquran.cloud/v1/surah')
+    .then(response => response.json())
+    .then(data => {
+      if (data.code === 200 && data.data) {
+        const map = {}
+        data.data.forEach(surah => {
+          if (surah.number && surah.englishName) {
+            // Normalize surah name for matching
+            const normalized = surah.englishName.toLowerCase().trim()
+            map[normalized] = surah.number
+            
+            // Also add without "Al-", "An-", "At-", "As-" prefixes for flexibility
+            const withoutPrefix = normalized.replace(/^(al-|an-|at-|as-)/, '')
+            if (withoutPrefix !== normalized) {
+              map[withoutPrefix] = surah.number
+            }
+            
+            // Add name without spaces/hyphens
+            const noSpaces = normalized.replace(/[\s-]/g, '')
+            if (noSpaces !== normalized) {
+              map[noSpaces] = surah.number
+            }
+          }
+        })
+        surahCache = map
+        return map
+      }
+      throw new Error('Failed to fetch surah data')
+    })
+    .catch(error => {
+      surahCachePromise = null
+      return null
+    })
+
+  return surahCachePromise
+}
+
+/**
+ * Maps surah names to surah numbers using Al-Quran Cloud API
+ * Uses the same API as the editor (api.alquran.cloud)
+ * @param {string} surahName - Name of the surah
+ * @returns {Promise<number|null>} Promise that resolves to surah number or null if not found
+ */
+async function getSurahNumber(surahName) {
+  const map = await fetchSurahMap()
+  if (!map) return null
+  
+  const normalized = surahName.toLowerCase().trim().replace(/\s+/g, ' ')
+  
+  // Try exact match first
+  if (map[normalized]) {
+    return map[normalized]
+  }
+  
+  // Try without "Surah" prefix
+  const withoutSurah = normalized.replace(/^surah\s+/, '')
+  if (withoutSurah !== normalized && map[withoutSurah]) {
+    return map[withoutSurah]
+  }
+  
+  // Try matching by removing common prefixes
+  const withoutPrefix = normalized.replace(/^(al-|an-|at-|as-)/, '')
+  if (withoutPrefix !== normalized && map[withoutPrefix]) {
+    return map[withoutPrefix]
+  }
+  
+  // Try without spaces/hyphens
+  const noSpaces = normalized.replace(/[\s-]/g, '')
+  if (map[noSpaces]) {
+    return map[noSpaces]
+  }
+  
+  // Try handling common spelling variations (e.g., Faatiha vs Fatiha)
+  const withVariations = normalized
+    .replace(/aa/g, 'a')  // Faatiha -> Fatiha
+    .replace(/ee/g, 'e')  // Other variations
+    .replace(/oo/g, 'o')
+  if (withVariations !== normalized && map[withVariations]) {
+    return map[withVariations]
+  }
+  
+  // Try with variations and without prefix
+  const withoutPrefixVariations = withoutPrefix
+    .replace(/aa/g, 'a')
+    .replace(/ee/g, 'e')
+    .replace(/oo/g, 'o')
+  if (withoutPrefixVariations !== withoutPrefix && map[withoutPrefixVariations]) {
+    return map[withoutPrefixVariations]
+  }
+  
+  return null
+}
+
+/**
+ * Parses verse reference to extract surah and ayah numbers
+ * @param {string} reference - Verse reference like "Al-Baqara 62" or "Al-Baqara 60-62"
+ * @returns {Promise<Object|null>} Promise that resolves to object with surah and ayah numbers, or null if parsing fails
+ */
+export async function parseVerseReference(reference) {
+  if (!reference) return null
+  
+  // Match pattern: "Surah Name" followed by space and number(s)
+  // Handles: "Al-Baqara 62", "Al-Baqara 60-62", "Surah Al-Baqara 62", etc.
+  const match = reference.match(/^(?:surah\s+)?([a-z\s'-]+)\s+(\d+)(?:-(\d+))?$/i)
+  
+  if (!match) return null
+  
+  const surahName = match[1].trim()
+  const surahNumber = await getSurahNumber(surahName)
+  
+  if (!surahNumber) return null
+  
+  const startAyah = parseInt(match[2], 10)
+  const endAyah = match[3] ? parseInt(match[3], 10) : startAyah
+  
+  return {
+    surah: surahNumber,
+    startAyah: startAyah,
+    endAyah: endAyah
+  }
+}
+
+/**
+ * Gets audio API endpoint for a verse from Al-Quran Cloud API (Al-Afasy reciter)
+ * Uses the same API as the editor (api.alquran.cloud)
+ * @param {number} surah - Surah number (1-114)
+ * @param {number} ayah - Ayah number
+ * @returns {string} API endpoint URL
+ */
+export function getAudioUrl(surah, ayah) {
+  // Al-Quran Cloud API format: https://api.alquran.cloud/v1/ayah/{surah}:{ayah}/ar.alafasy
+  return `https://api.alquran.cloud/v1/ayah/${surah}:${ayah}/ar.alafasy`
+}
+
 /**
  * Builds HTML for a Quranic verse block
  * @param {Object} verse - Verse object with reference
@@ -235,7 +387,10 @@ function buildVerseHTML(verse, parts) {
   let html = '<div class="quran-verse">'
   
   if (verse.reference) {
-    html += `<div class="verse-header"><span class="verse-reference">${verse.reference}</span></div>`
+    // Store reference for async parsing later - audio buttons will be added dynamically
+    html += `<div class="verse-header" data-verse-reference="${verse.reference}">
+      <span class="verse-reference">${verse.reference}</span>
+    </div>`
   }
 
   // Add Arabic text

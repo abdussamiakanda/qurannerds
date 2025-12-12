@@ -183,7 +183,6 @@
   display: flex;
   align-items: center;
   gap: 16px;
-  flex: 1;
   min-width: 0;
   text-decoration: none;
   color: inherit;
@@ -431,6 +430,11 @@
   padding-bottom: 12px;
   border-bottom: 1px solid var(--border-color);
   text-align: right;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  position: relative;
 }
 
 .post-content .verse-reference {
@@ -445,6 +449,48 @@
   background-color: var(--bg-tertiary);
   border: 1px solid var(--border-color);
   border-radius: 6px;
+}
+
+.post-content .verse-audio-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  background-color: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: var(--text-secondary);
+  flex-shrink: 0;
+  pointer-events: auto;
+  position: relative;
+  z-index: 10;
+}
+
+.post-content .verse-audio-btn:hover {
+  background-color: var(--bg-hover);
+  border-color: var(--text-primary);
+  color: var(--text-primary);
+  transform: scale(1.05);
+}
+
+.post-content .verse-audio-btn:active {
+  transform: scale(0.95);
+}
+
+.post-content .verse-audio-btn:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+.post-content .verse-audio-btn .audio-icon {
+  width: 16px;
+  height: 16px;
+  stroke-width: 2;
+  pointer-events: none;
 }
 
 .post-content .verse-arabic {
