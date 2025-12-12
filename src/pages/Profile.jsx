@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom'
 import { MapPin, Globe, Twitter, Home, Users } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import LogoIcon from '../components/LogoIcon'
+import GamificationStats from '../components/GamificationStats'
 import { getExcerpt, createProfileSlug, createNoteSlug } from '../utils/textUtils'
 import './Profile.css'
 
@@ -251,10 +252,14 @@ function Profile({ user }) {
         </div>
       </div>
 
+      {profile && (
+        <GamificationStats userId={profile.id} />
+      )}
+
       <div className="profile-content">
         <div className="profile-posts-section">
           <h2 className="profile-section-title">
-            Posts ({posts.length})
+            Notes ({posts.length})
           </h2>
           {posts.length === 0 ? (
             <div className="profile-empty-posts">

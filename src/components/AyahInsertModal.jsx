@@ -1,12 +1,37 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { X } from 'lucide-react'
 import './AyahInsertModal.css'
 
-function AyahInsertModal({ isOpen, onClose, onInsert }) {
+// HTML sanitization helper to prevent XSS
+function escapeHtml(text) {
+  const div = document.createElement('div')
+  div.textContent = text
+  return div.innerHTML
+}
+
+function AyahInsertModal({ onClose, onInsert }) {
   const [surah, setSurah] = useState('')
   const [ayah, setAyah] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+
+  // Handle escape key to close modal
+  useEffect(() => {
+    const handleEscape = (e) => {
+      if (e.key === 'Escape' && !loading) {
+        onClose()
+      }
+    }
+    document.addEventListener('keydown', handleEscape)
+    return () => document.removeEventListener('keydown', handleEscape)
+  }, [onClose, loading])
+
+  // Clear error when inputs change
+  useEffect(() => {
+    if (error) {
+      setError('')
+    }
+  }, [surah, ayah])
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -23,15 +48,22 @@ function AyahInsertModal({ isOpen, onClose, onInsert }) {
       return
     }
 
-    // Parse ayah input - can be single number or range like "1-4"
+    // Parse ayah input - can be single number or range like "1-4" or "1 - 4"
     let startAyah, endAyah
-    if (ayah.includes('-')) {
-      const parts = ayah.split('-').map(s => s.trim())
+    const ayahTrimmed = ayah.trim()
+    
+    if (ayahTrimmed.includes('-')) {
+      const parts = ayahTrimmed.split(/[-\u2013\u2014]/).map(s => s.trim()).filter(s => s)
+      if (parts.length !== 2) {
+        setError('Invalid ayah range format. Use format like "1-4" or "1 - 4"')
+        return
+      }
+      
       startAyah = parseInt(parts[0])
       endAyah = parseInt(parts[1])
       
       if (isNaN(startAyah) || isNaN(endAyah) || startAyah < 1 || endAyah < 1) {
-        setError('Invalid ayah range. Use format like "1-4"')
+        setError('Ayah numbers must be positive integers')
         return
       }
       
@@ -39,12 +71,18 @@ function AyahInsertModal({ isOpen, onClose, onInsert }) {
         setError('Start ayah must be less than or equal to end ayah')
         return
       }
+      
+      // Limit range to 10 ayahs
+      if (endAyah - startAyah + 1 > 10) {
+        setError('Maximum 10 ayahs can be fetched at once. Please use a smaller range.')
+        return
+      }
     } else {
-      startAyah = parseInt(ayah)
-      endAyah = parseInt(ayah)
+      startAyah = parseInt(ayahTrimmed)
+      endAyah = parseInt(ayahTrimmed)
       
       if (isNaN(startAyah) || startAyah < 1) {
-        setError('Ayah number must be a positive number')
+        setError('Ayah number must be a positive integer')
         return
       }
     }
@@ -53,32 +91,62 @@ function AyahInsertModal({ isOpen, onClose, onInsert }) {
     setError('')
 
     try {
-      // Fetch all ayahs in the range
+      // Fetch all ayahs in the range using Promise.allSettled for better error handling
       const ayahPromises = []
       for (let ayahNum = startAyah; ayahNum <= endAyah; ayahNum++) {
         ayahPromises.push(
-          Promise.all([
-            fetch(`https://api.alquran.cloud/v1/ayah/${surahNum}:${ayahNum}/ar.asad`).catch(() => null),
-            fetch(`https://api.alquran.cloud/v1/ayah/${surahNum}:${ayahNum}/en.asad`).catch(() => null),
-            fetch(`https://api.alquran.cloud/v1/ayah/${surahNum}:${ayahNum}/bn.bengali`).catch(() => null)
+          Promise.allSettled([
+            fetch(`https://api.alquran.cloud/v1/ayah/${surahNum}:${ayahNum}/ar.asad`),
+            fetch(`https://api.alquran.cloud/v1/ayah/${surahNum}:${ayahNum}/en.asad`),
+            fetch(`https://api.alquran.cloud/v1/ayah/${surahNum}:${ayahNum}/bn.bengali`)
           ])
         )
       }
 
-      const allResponses = await Promise.all(ayahPromises)
+      const allResults = await Promise.all(ayahPromises)
 
-      // Check if any request failed
-      if (allResponses.some(res => !res[0] || !res[1] || !res[2])) {
-        throw new Error('Failed to connect to API. Please check your internet connection.')
+      // Check for network errors and validate responses
+      // allResults is an array where each element is the result of Promise.allSettled
+      // which is an array of 3 objects: [{status, value, reason}, ...]
+      const validatedResponses = []
+      for (let i = 0; i < allResults.length; i++) {
+        const results = allResults[i]
+        
+        // results should be an array of 3 Promise.allSettled results
+        if (!Array.isArray(results) || results.length !== 3) {
+          throw new Error(`Unexpected response format for ayah ${startAyah + i}. Please try again.`)
+        }
+        
+        const [arabicResult, englishResult, banglaResult] = results
+        
+        // Check if any fetch failed
+        if (arabicResult.status === 'rejected' || !arabicResult.value || !arabicResult.value.ok) {
+          const reason = arabicResult.reason?.message || arabicResult.reason || 'Network error'
+          throw new Error(`Failed to fetch Arabic text for ayah ${startAyah + i}: ${reason}`)
+        }
+        if (englishResult.status === 'rejected' || !englishResult.value || !englishResult.value.ok) {
+          const reason = englishResult.reason?.message || englishResult.reason || 'Network error'
+          throw new Error(`Failed to fetch English translation for ayah ${startAyah + i}: ${reason}`)
+        }
+        if (banglaResult.status === 'rejected' || !banglaResult.value || !banglaResult.value.ok) {
+          const reason = banglaResult.reason?.message || banglaResult.reason || 'Network error'
+          throw new Error(`Failed to fetch Bengali translation for ayah ${startAyah + i}: ${reason}`)
+        }
+        
+        validatedResponses.push({
+          arabic: arabicResult.value,
+          english: englishResult.value,
+          bangla: banglaResult.value
+        })
       }
 
       // Parse all responses
       const allData = await Promise.all(
-        allResponses.map(res => 
+        validatedResponses.map(({ arabic, english, bangla }) => 
           Promise.all([
-            res[0].json(),
-            res[1].json(),
-            res[2].json()
+            arabic.json(),
+            english.json(),
+            bangla.json()
           ])
         )
       )
@@ -86,21 +154,22 @@ function AyahInsertModal({ isOpen, onClose, onInsert }) {
       // Validate all responses
       for (let i = 0; i < allData.length; i++) {
         const [arabicData, englishData, banglaData] = allData[i]
-        if (arabicData.code !== 200 || !arabicData.data) {
-          throw new Error(`Failed to fetch Arabic text for ayah ${startAyah + i}. Please check the surah and ayah number.`)
+        
+        if (!arabicData || arabicData.code !== 200 || !arabicData.data || !arabicData.data.text) {
+          throw new Error(`Invalid response for Arabic text of ayah ${startAyah + i}. Please try again.`)
         }
-        if (englishData.code !== 200 || !englishData.data) {
-          throw new Error(`Failed to fetch English translation for ayah ${startAyah + i}. Please check the surah and ayah number.`)
+        if (!englishData || englishData.code !== 200 || !englishData.data || !englishData.data.text) {
+          throw new Error(`Invalid response for English translation of ayah ${startAyah + i}. Please try again.`)
         }
-        if (banglaData.code !== 200 || !banglaData.data) {
-          throw new Error(`Failed to fetch Bengali translation for ayah ${startAyah + i}. Please check the surah and ayah number.`)
+        if (!banglaData || banglaData.code !== 200 || !banglaData.data || !banglaData.data.text) {
+          throw new Error(`Invalid response for Bengali translation of ayah ${startAyah + i}. Please try again.`)
         }
       }
 
       // Get surah name from first ayah
       const surahName = allData[0][0].data.surah?.englishName || `Surah ${surahNum}`
       
-      // Combine all ayahs
+      // Combine all ayahs (sanitize to prevent XSS)
       const arabicTexts = allData.map(([arabicData]) => arabicData.data.text || '').join(' ')
       const englishTexts = allData.map(([, englishData]) => englishData.data.text || '').join(' ')
       const banglaTexts = allData.map(([, , banglaData]) => banglaData.data.text || '').join(' ')
@@ -110,42 +179,65 @@ function AyahInsertModal({ isOpen, onClose, onInsert }) {
         ? `${surahName} ${startAyah}`
         : `${surahName} ${startAyah}-${endAyah}`
 
-      // Format the verse for insertion
-      const formattedVerse = `
-<div class="quran-verse">
-  <div class="verse-header">
-    <span class="verse-reference">${referenceText}</span>
+      // Escape reference for HTML attribute (escape quotes and special chars)
+      const escapedReference = referenceText.replace(/"/g, '&quot;').replace(/'/g, '&#39;')
+
+      // Format the verse for insertion with proper HTML sanitization
+      // Note: Arabic text is trusted from API, but we escape English/Bangla for safety
+      // Remove any leading/trailing whitespace and newlines to prevent empty divs
+      // Include data-verse-reference attribute for audio button functionality
+      const formattedVerse = `<div class="quran-verse">
+  <div class="verse-header" data-verse-reference="${escapedReference}">
+    <span class="verse-reference">${escapeHtml(referenceText)}</span>
   </div>
   <div class="verse-arabic">
     ${arabicTexts}
   </div>
   <div class="verse-translation">
-    <p class="verse-english"><strong>English:</strong> ${englishTexts}</p>
-    <p class="verse-bangla"><strong>বাংলা:</strong> ${banglaTexts}</p>
+    <p class="verse-english"><strong>English:</strong> ${escapeHtml(englishTexts)}</p>
+    <p class="verse-bangla"><strong>বাংলা:</strong> ${escapeHtml(banglaTexts)}</p>
   </div>
-</div>
-`
+</div>`.trim()
 
       onInsert(formattedVerse)
       onClose()
       setSurah('')
       setAyah('')
+      setError('')
     } catch (err) {
       console.error('Error fetching verse:', err)
-      setError(err.message || 'Failed to fetch verse. Please try again.')
+      setError(err.message || 'Failed to fetch verse. Please check your internet connection and try again.')
     } finally {
       setLoading(false)
     }
   }
 
-  if (!isOpen) return null
+  const handleInputChange = (field, value) => {
+    if (field === 'surah') {
+      setSurah(value)
+    } else if (field === 'ayah') {
+      setAyah(value)
+    }
+  }
+
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter' && !loading && surah && ayah) {
+      e.preventDefault()
+      handleSubmit(e)
+    }
+  }
 
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
           <h2 className="modal-title">Insert Quranic Verse</h2>
-          <button className="modal-close-btn" onClick={onClose}>
+          <button 
+            className="modal-close-btn" 
+            onClick={onClose}
+            disabled={loading}
+            aria-label="Close modal"
+          >
             <X size={20} />
           </button>
         </div>
@@ -159,10 +251,12 @@ function AyahInsertModal({ isOpen, onClose, onInsert }) {
               min="1"
               max="114"
               value={surah}
-              onChange={(e) => setSurah(e.target.value)}
+              onChange={(e) => handleInputChange('surah', e.target.value)}
+              onKeyDown={handleKeyDown}
               className="ayah-input"
               placeholder="e.g., 1"
-              required
+              disabled={loading}
+              autoFocus
             />
           </div>
 
@@ -172,15 +266,19 @@ function AyahInsertModal({ isOpen, onClose, onInsert }) {
               id="ayah"
               type="text"
               value={ayah}
-              onChange={(e) => setAyah(e.target.value)}
+              onChange={(e) => handleInputChange('ayah', e.target.value)}
+              onKeyDown={handleKeyDown}
               className="ayah-input"
               placeholder="e.g., 1 or 1-4"
-              required
+              disabled={loading}
             />
+            <small style={{ color: 'var(--text-tertiary)', fontSize: '12px', marginTop: '4px' }}>
+              Maximum 10 ayahs can be fetched at once
+            </small>
           </div>
 
           {error && (
-            <div className="ayah-error">
+            <div className="ayah-error" role="alert">
               {error}
             </div>
           )}
@@ -198,7 +296,7 @@ function AyahInsertModal({ isOpen, onClose, onInsert }) {
               type="button"
               onClick={handleSubmit}
               className="insert-btn"
-              disabled={loading}
+              disabled={loading || !surah || !ayah}
             >
               {loading ? 'Fetching...' : 'Insert Verse'}
             </button>

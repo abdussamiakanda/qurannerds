@@ -1,0 +1,194 @@
+.gamification-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 16px;
+  margin: 24px 0;
+}
+
+.gamification-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 20px;
+  transition: all 0.3s ease;
+}
+
+.gamification-card:hover {
+  box-shadow: 0 4px 12px var(--shadow-sm);
+  transform: translateY(-2px);
+}
+
+.gamification-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.gamification-icon {
+  color: var(--accent);
+  flex-shrink: 0;
+}
+
+.gamification-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.level-progress {
+  margin-bottom: 12px;
+}
+
+.level-progress-bar {
+  width: 100%;
+  height: 8px;
+  background: var(--bg-secondary);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.level-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent) 0%, var(--accent-light, var(--accent)) 100%);
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+.level-progress-text {
+  font-size: 12px;
+  color: var(--text-secondary);
+  text-align: center;
+}
+
+.points-display {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 12px;
+  border-top: 1px solid var(--border-color);
+}
+
+.points-label {
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+.points-value {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.streak-display {
+  text-align: center;
+}
+
+.streak-current {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.streak-number {
+  font-size: 36px;
+  font-weight: 700;
+  color: var(--accent);
+  line-height: 1;
+}
+
+.streak-label {
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin-top: 4px;
+}
+
+.streak-longest {
+  font-size: 12px;
+  color: var(--text-tertiary);
+  padding-top: 12px;
+  border-top: 1px solid var(--border-color);
+}
+
+.achievements-display {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.achievements-count {
+  font-size: 14px;
+  color: var(--text-secondary);
+  text-align: center;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.achievements-preview {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.achievement-badge {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 2px solid transparent;
+  color: white;
+}
+
+.achievement-badge svg {
+  width: 24px;
+  height: 24px;
+}
+
+.achievement-badge:hover {
+  transform: scale(1.1);
+  border-color: var(--accent);
+}
+
+.achievement-badge-more {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
+  font-size: 14px;
+  font-weight: 600;
+  border: 2px dashed var(--border-color);
+}
+
+.gamification-loading {
+  text-align: center;
+  padding: 40px;
+  color: var(--text-secondary);
+}
+
+@media (max-width: 768px) {
+  .gamification-stats {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .gamification-card {
+    padding: 16px;
+  }
+
+  .streak-number {
+    font-size: 28px;
+  }
+}

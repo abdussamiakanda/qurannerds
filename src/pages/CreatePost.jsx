@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { createNoteSlug } from '../utils/textUtils'
+import { awardPoints } from '../utils/gamification'
 import RichTextEditor from '../components/RichTextEditor'
 import './CreatePost.css'
 
@@ -73,6 +74,9 @@ function CreatePost({ user }) {
         .single()
 
       if (error) throw error
+
+      // Award points for creating a post
+      await awardPoints(user.id, 10, 'post_created', data.id, 'Created a new post')
 
       const noteSlug = createNoteSlug(data.title, data.id)
       

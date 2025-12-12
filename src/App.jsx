@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom'
 import { useState, useEffect } from 'react'
 import { supabase } from './lib/supabase'
 import { ThemeProvider } from './contexts/ThemeContext'
@@ -15,6 +15,33 @@ import Profile from './pages/Profile'
 import Auth from './pages/Auth'
 import NotFound from './pages/NotFound'
 import './App.css'
+
+function AppContent({ user }) {
+  const location = useLocation()
+  const hideFooter = location.pathname === '/create' || location.pathname.startsWith('/edit/')
+
+  return (
+    <div className="app">
+      <Navbar user={user} />
+      <main className="app-main">
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/notes" element={<Notes user={user} />} />
+          <Route path="/note/:slug" element={<Note user={user} />} />
+          <Route path="/dashboard" element={<Dashboard user={user} />} />
+          <Route path="/create" element={<CreatePost user={user} />} />
+          <Route path="/edit/:slug" element={<EditPost user={user} />} />
+          <Route path="/settings" element={<Settings user={user} />} />
+          <Route path="/profile/:slug" element={<Profile user={user} />} />
+          <Route path="/profile" element={<Profile user={user} />} />
+          <Route path="/auth" element={<Auth />} />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </main>
+      {!hideFooter && <Footer />}
+    </div>
+  )
+}
 
 function App() {
   const [user, setUser] = useState(null)
@@ -48,25 +75,7 @@ function App() {
   return (
     <ThemeProvider>
       <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-        <div className="app">
-          <Navbar user={user} />
-          <main className="app-main">
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/notes" element={<Notes user={user} />} />
-              <Route path="/note/:slug" element={<Note user={user} />} />
-              <Route path="/dashboard" element={<Dashboard user={user} />} />
-              <Route path="/create" element={<CreatePost user={user} />} />
-              <Route path="/edit/:slug" element={<EditPost user={user} />} />
-              <Route path="/settings" element={<Settings user={user} />} />
-              <Route path="/profile/:slug" element={<Profile user={user} />} />
-              <Route path="/profile" element={<Profile user={user} />} />
-              <Route path="/auth" element={<Auth />} />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </main>
-          <Footer />
-        </div>
+        <AppContent user={user} />
       </Router>
     </ThemeProvider>
   )

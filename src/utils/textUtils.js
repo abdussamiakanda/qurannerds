@@ -130,29 +130,44 @@ export function processQuranicContent(html) {
     const tempDiv = document.createElement('div')
     tempDiv.innerHTML = html
 
-  // Get all direct child divs
-  const divs = Array.from(tempDiv.querySelectorAll('div'))
-  
-  let processedHTML = ''
-  let currentVerse = null
-  let verseParts = []
-  let i = 0
+    // First, preserve all existing quran-verse divs
+    const existingVerses = tempDiv.querySelectorAll('.quran-verse')
+    existingVerses.forEach(verse => {
+      // Mark as already processed
+      verse.setAttribute('data-processed', 'true')
+    })
 
-  while (i < divs.length) {
-    const div = divs[i]
-    const text = div.textContent.trim()
-    const innerHTML = div.innerHTML.trim()
+    // Get all direct child divs (only from the root, not nested)
+    const rootDivs = Array.from(tempDiv.children).filter(child => child.tagName === 'DIV')
+    
+    let processedHTML = ''
+    let currentVerse = null
+    let verseParts = []
+    let i = 0
 
-    // Skip empty divs (like <div><br></div>)
-    if (!text || text === '<br>' || text === '') {
-      // If we have a verse in progress, keep it open
-      // Otherwise, add empty div as is
-      if (!currentVerse) {
-        processedHTML += `<div>${innerHTML}</div>`
+    while (i < rootDivs.length) {
+      const div = rootDivs[i]
+      
+      // If this is already a processed quran-verse, preserve it as-is
+      if (div.classList.contains('quran-verse') || div.getAttribute('data-processed') === 'true') {
+        processedHTML += div.outerHTML
+        i++
+        continue
       }
-      i++
-      continue
-    }
+      
+      const text = div.textContent.trim()
+      const innerHTML = div.innerHTML.trim()
+
+      // Skip empty divs (like <div><br></div>)
+      if (!text || text === '<br>' || text === '') {
+        // If we have a verse in progress, keep it open
+        // Otherwise, add empty div as is
+        if (!currentVerse) {
+          processedHTML += `<div>${innerHTML}</div>`
+        }
+        i++
+        continue
+      }
 
     // Check if this is a Surah reference
     if (isSurahReference(text) && !containsArabic(text)) {
@@ -388,7 +403,9 @@ function buildVerseHTML(verse, parts) {
   
   if (verse.reference) {
     // Store reference for async parsing later - audio buttons will be added dynamically
-    html += `<div class="verse-header" data-verse-reference="${verse.reference}">
+    // Escape the reference to prevent XSS
+    const escapedReference = verse.reference.replace(/"/g, '&quot;')
+    html += `<div class="verse-header" data-verse-reference="${escapedReference}">
       <span class="verse-reference">${verse.reference}</span>
     </div>`
   }

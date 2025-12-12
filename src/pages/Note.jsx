@@ -4,6 +4,7 @@ import { Heart, Eye, MessageCircle, Home, BookOpen } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import Comments from '../components/Comments'
 import LogoIcon from '../components/LogoIcon'
+import { awardPoints } from '../utils/gamification'
 import { processQuranicContent, extractIdFromSlug, createProfileSlug, getAudioUrl, parseVerseReference } from '../utils/textUtils'
 import './Note.css'
 
@@ -395,6 +396,28 @@ function Note({ user }) {
       }
     } catch (error) {
       console.error('Error incrementing views:', error)
+    }
+
+    // Award points for reading a post (only once per user per post)
+    if (user && note && note.id) {
+      try {
+        // Check if user already read this post today to avoid duplicate points
+        const today = new Date().toISOString().split('T')[0]
+        const { data: existingActivity } = await supabase
+          .from('daily_activities')
+          .select('posts_read')
+          .eq('user_id', user.id)
+          .eq('activity_date', today)
+          .maybeSingle()
+
+        // Only award points if user hasn't read many posts today (to prevent abuse)
+        if (!existingActivity || (existingActivity.posts_read || 0) < 10) {
+          await awardPoints(user.id, 1, 'post_read', note.id, 'Read a post')
+        }
+      } catch (pointsError) {
+        // Silently fail - don't block view incrementing if points fail
+        console.error('Error awarding points for reading:', pointsError)
+      }
     }
   }
 
