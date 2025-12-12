@@ -14,6 +14,17 @@ function Auth() {
   const [message, setMessage] = useState('')
 
   useEffect(() => {
+    // Check URL for auth callback (email confirmation)
+    // Supabase uses hash fragments for PKCE flow
+    const hashParams = new URLSearchParams(window.location.hash.substring(1))
+    const accessToken = hashParams.get('access_token')
+    const type = hashParams.get('type')
+    
+    // Also check query parameters (some flows use these)
+    const queryParams = new URLSearchParams(window.location.search)
+    const queryToken = queryParams.get('access_token')
+    const queryType = queryParams.get('type')
+    
     // Handle email confirmation callback
     const handleAuthCallback = async () => {
       // Wait a moment for Supabase to process the token
@@ -33,17 +44,6 @@ function Auth() {
         setMessage('Error signing in. Please try again.')
       }
     }
-
-    // Check URL for auth callback (email confirmation)
-    // Supabase uses hash fragments for PKCE flow
-    const hashParams = new URLSearchParams(window.location.hash.substring(1))
-    const accessToken = hashParams.get('access_token')
-    const type = hashParams.get('type')
-    
-    // Also check query parameters (some flows use these)
-    const queryParams = new URLSearchParams(window.location.search)
-    const queryToken = queryParams.get('access_token')
-    const queryType = queryParams.get('type')
     
     // Handle both signup and magic link (recovery) callbacks
     if ((accessToken && (type === 'signup' || type === 'recovery')) || 
@@ -69,6 +69,7 @@ function Auth() {
     try {
       if (isSignUp) {
         // Get the current site URL for redirect
+        // Note: This URL must be whitelisted in Supabase Dashboard > Authentication > URL Configuration
         const siteUrl = window.location.origin
         const redirectTo = `${siteUrl}/auth`
         
@@ -87,9 +88,10 @@ function Auth() {
 
         if (data.user) {
           setMessage('Account created! Please check your email to verify your account.')
-          setTimeout(() => {
-            navigate('/')
-          }, 2000)
+          // Clear form
+          setEmail('')
+          setPassword('')
+          setName('')
         }
       } else if (isForgotPassword) {
         // Send magic link for passwordless login
@@ -118,7 +120,18 @@ function Auth() {
         navigate('/dashboard')
       }
     } catch (error) {
-      setMessage(error.message || 'An error occurred')
+      console.error('Auth error:', error)
+      // Show more detailed error message
+      const errorMessage = error.message || error.error_description || 'An error occurred'
+      setMessage(`Error: ${errorMessage}`)
+      
+      // Log full error for debugging
+      if (error.status) {
+        console.error('Error status:', error.status)
+      }
+      if (error.error) {
+        console.error('Error details:', error.error)
+      }
     } finally {
       setLoading(false)
     }
