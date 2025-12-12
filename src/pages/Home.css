@@ -970,6 +970,10 @@
     font-size: 18px;
   }
 
+  .hero-icon {
+    max-width: 300px;
+  }
+
   .hero-actions {
     justify-content: center;
   }
@@ -1099,6 +1103,10 @@
 
   .hero-subtitle {
     font-size: 16px;
+  }
+
+  .hero-icon {
+    max-width: 200px;
   }
 
   .hero-actions {

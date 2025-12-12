@@ -414,7 +414,7 @@
 @media (max-width: 768px) {
   .post-content .quran-verse {
     padding: 20px;
-    margin: 2em 0;
+    margin: 0 0 2em 0;
   }
 
   .post-content .verse-header {
@@ -630,6 +630,36 @@
   .engagement-btn {
     width: 100%;
     justify-content: center;
+  }
+
+  .post-content .verse-arabic {
+    font-size: 16px;
+    line-height: 1.65;
+    padding: 12px 16px;
+    margin-top: 10px;
+    margin-bottom: 12px;
+  }
+
+  .post-content .verse-arabic::after,
+  .post-content .verse-arabic::before {
+    font-size: 12px;
+  }
+
+  .post-content .verse-translation {
+    margin-top: 12px;
+    gap: 8px;
+  }
+
+  .post-content .verse-english,
+  .post-content .verse-bangla {
+    font-size: 14px !important;
+    line-height: 1.65;
+    padding: 12px 14px;
+  }
+
+  .post-content .verse-reference {
+    font-size: 11px;
+    padding: 4px 8px;
   }
 }
 
