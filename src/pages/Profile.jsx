@@ -4,6 +4,7 @@ import { MapPin, Globe, Twitter, Home, Users } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import LogoIcon from '../components/LogoIcon'
 import GamificationStats from '../components/GamificationStats'
+import SEO from '../components/SEO'
 import { getExcerpt, createProfileSlug, createNoteSlug } from '../utils/textUtils'
 import './Profile.css'
 
@@ -188,9 +189,21 @@ function Profile({ user }) {
   }
 
   const isOwnProfile = user && user.id === profile.id
+  const profileName = profile?.name || 'User'
+  const profileUrl = profile && typeof window !== 'undefined' 
+    ? `${window.location.origin}/profile/${createProfileSlug(profileName)}` 
+    : (typeof window !== 'undefined' ? window.location.href : '')
 
   return (
     <div className="profile-page">
+      {profile && (
+        <SEO
+          title={`${profileName}'s Profile`}
+          description={profile.bio || `View ${profileName}'s profile on QuranNerds. See their Quranic study notes, insights, and contributions to our community.`}
+          keywords={`${profileName}, QuranNerds profile, Islamic studies, Quran notes, ${profile.location || ''}`}
+          url={profileUrl}
+        />
+      )}
       <div className="profile-header">
         <div className="profile-avatar-container">
           {profile.avatar_url && profile.avatar_url.trim() ? (

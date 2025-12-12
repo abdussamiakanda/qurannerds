@@ -1,11 +1,17 @@
 import { Link } from 'react-router-dom'
 import { Home, ArrowLeft } from 'lucide-react'
 import LogoIcon from '../components/LogoIcon'
+import SEO from '../components/SEO'
 import './NotFound.css'
 
 function NotFound() {
   return (
     <div className="not-found-page">
+      <SEO
+        title="Page Not Found"
+        description="The page you're looking for doesn't exist on QuranNerds. Return to our homepage to explore Quranic study notes and insights."
+        url={typeof window !== 'undefined' ? window.location.href : ''}
+      />
       <div className="not-found-container">
         <div className="not-found-content">
           <LogoIcon size={64} className="not-found-icon" />

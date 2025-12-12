@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
+import SEO from '../components/SEO'
 import './Auth.css'
 
 function Auth() {
@@ -139,6 +140,16 @@ function Auth() {
 
   return (
     <div className="auth-page">
+      <SEO
+        title={isSignUp ? "Sign Up" : isForgotPassword ? "Reset Password" : "Sign In"}
+        description={isSignUp 
+          ? "Create a free account on QuranNerds to start sharing your Quranic study notes, reflections, and insights with our community."
+          : isForgotPassword
+          ? "Reset your QuranNerds password. Get a secure sign-in link sent to your email."
+          : "Sign in to QuranNerds to access your notes, engage with the community, and share your Quranic insights."}
+        keywords="QuranNerds sign in, Islamic study platform, Quran notes account, Muslim community"
+        url={typeof window !== 'undefined' ? `${window.location.origin}/auth` : ''}
+      />
       <div className="auth-container">
         <div className="auth-header">
           <h1 className="auth-title">

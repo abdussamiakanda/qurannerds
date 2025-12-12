@@ -4,8 +4,9 @@ import { Heart, Eye, MessageCircle, Home, BookOpen } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import Comments from '../components/Comments'
 import LogoIcon from '../components/LogoIcon'
+import SEO from '../components/SEO'
 import { awardPoints } from '../utils/gamification'
-import { processQuranicContent, extractIdFromSlug, createProfileSlug, getAudioUrl, parseVerseReference } from '../utils/textUtils'
+import { processQuranicContent, extractIdFromSlug, createProfileSlug, getAudioUrl, parseVerseReference, getExcerpt } from '../utils/textUtils'
 import './Note.css'
 
 function Note({ user }) {
@@ -598,8 +599,24 @@ function Note({ user }) {
 
   const isAuthor = user && user.id === note.author_id
 
+  // Get excerpt for SEO description
+  const noteExcerpt = note ? getExcerpt(note.content, 160) : ''
+  const noteUrl = note && typeof window !== 'undefined' ? `${window.location.origin}/note/${slug}` : (typeof window !== 'undefined' ? window.location.href : '')
+
   return (
     <div className="post-page">
+      {note && (
+        <SEO
+          title={note.title}
+          description={noteExcerpt || `Read "${note.title}" by ${authorProfile?.name || note.author_name || 'Anonymous'} on QuranNerds. Join our community of learners sharing Quranic insights and reflections.`}
+          keywords={`Quran, ${note.title}, Islamic studies, Quranic knowledge, ${authorProfile?.name || note.author_name || ''}`}
+          type="article"
+          url={noteUrl}
+          author={authorProfile?.name || note.author_name || 'Anonymous'}
+          publishedTime={note.created_at}
+          modifiedTime={note.updated_at}
+        />
+      )}
       <article className="post-article">
         <div className="post-header">
           <h1 className="post-title">{note.title}</h1>

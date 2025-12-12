@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
+import SEO from '../components/SEO'
 import './Settings.css'
 
 function Settings({ user }) {
@@ -247,6 +248,12 @@ function Settings({ user }) {
 
   return (
     <div className="settings">
+      <SEO
+        title="Settings"
+        description="Manage your QuranNerds account settings, profile information, and preferences. Customize your experience on our Quranic study platform."
+        keywords="QuranNerds settings, account settings, profile settings"
+        url={typeof window !== 'undefined' ? `${window.location.origin}/settings` : ''}
+      />
       <div className="settings-container">
         <h1 className="settings-title">Settings</h1>
 

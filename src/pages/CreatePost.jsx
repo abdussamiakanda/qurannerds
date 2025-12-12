@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
+import SEO from '../components/SEO'
 import { createNoteSlug } from '../utils/textUtils'
 import { awardPoints } from '../utils/gamification'
 import RichTextEditor from '../components/RichTextEditor'
@@ -119,6 +120,12 @@ function CreatePost({ user }) {
 
   return (
     <div className="create-post-page">
+      <SEO
+        title="Create Note"
+        description="Create and share your Quranic study notes, reflections, and insights on QuranNerds. Join our community of learners sharing knowledge about the Quran."
+        keywords="create Quran note, write Islamic study, share Quran insights, QuranNerds"
+        url={typeof window !== 'undefined' ? `${window.location.origin}/create` : ''}
+      />
       <div className="create-post-container">
         <h1 className="create-post-title">Create New Note</h1>
         <form onSubmit={handleSubmit} className="create-post-form">

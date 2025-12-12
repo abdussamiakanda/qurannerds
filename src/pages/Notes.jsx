@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Heart, Eye, MessageCircle, Search } from 'lucide-react'
 import { supabase } from '../lib/supabase'
+import SEO from '../components/SEO'
 import { getExcerpt, createNoteSlug, createProfileSlug } from '../utils/textUtils'
 import './Home.css'
 
@@ -139,6 +140,12 @@ function Notes({ user }) {
 
   return (
     <div className="home">
+      <SEO
+        title="Notes"
+        description="Browse and explore Quranic study notes, reflections, and insights shared by our community. Discover new perspectives on Islamic teachings and deepen your understanding of the Quran."
+        keywords="Quran notes, Islamic study notes, Quranic reflections, Islamic insights, Quran study, Tafsir notes, Islamic learning"
+        url={typeof window !== 'undefined' ? `${window.location.origin}/notes` : ''}
+      />
       <div className="home-header">
         <h1 className="home-title">Quran Study Notes</h1>
         <p className="home-subtitle">

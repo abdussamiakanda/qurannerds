@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
+import SEO from '../components/SEO'
 import { getExcerpt, createNoteSlug } from '../utils/textUtils'
 import './Dashboard.css'
 
@@ -72,6 +73,12 @@ function Dashboard({ user }) {
 
   return (
     <div className="dashboard">
+      <SEO
+        title="Dashboard"
+        description="Manage your Quranic study notes on QuranNerds. View, edit, and organize your reflections and insights on the Quran."
+        keywords="Quran notes dashboard, manage notes, Islamic study notes, QuranNerds dashboard"
+        url={typeof window !== 'undefined' ? `${window.location.origin}/dashboard` : ''}
+      />
       <div className="dashboard-header">
         <h1 className="dashboard-title">Your Notes</h1>
         <Link to="/create" className="new-post-btn">

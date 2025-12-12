@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { BookOpen, Users, Heart, Target, FileText, MessageSquare } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import LogoIcon from '../components/LogoIcon'
+import SEO from '../components/SEO'
 import './Home.css'
 
 function Home() {
@@ -62,6 +63,12 @@ function Home() {
 
   return (
     <div className="home-page">
+      <SEO
+        title="Home"
+        description="QuranNerds - A platform dedicated to sharing knowledge, insights, and reflections on the Quran. Join our community of learners and scholars to deepen your understanding of Islamic teachings."
+        keywords="Quran, Islamic studies, Quranic knowledge, Muslim community, Islamic education, Quran study, Tafsir, Hadith, Islamic learning"
+        url={typeof window !== 'undefined' ? window.location.origin : ''}
+      />
       {/* Hero Section */}
       <section className="hero-section">
         <div className="hero-container">

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
+import SEO from '../components/SEO'
 import { extractIdFromSlug, createNoteSlug } from '../utils/textUtils'
 import RichTextEditor from '../components/RichTextEditor'
 import './EditPost.css'
@@ -149,6 +150,12 @@ function EditPost({ user }) {
 
   return (
     <div className="edit-post-page">
+      <SEO
+        title={title ? `Edit: ${title}` : "Edit Note"}
+        description="Edit your Quranic study note on QuranNerds. Update your reflections and insights on the Quran."
+        keywords="edit Quran note, update Islamic study, QuranNerds edit"
+        url={typeof window !== 'undefined' ? (title ? `${window.location.origin}/edit/${slug}` : `${window.location.origin}/edit`) : ''}
+      />
       <div className="edit-post-container">
         <h1 className="edit-post-title">Edit Note</h1>
         <form onSubmit={handleSubmit} className="edit-post-form">
