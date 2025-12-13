@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import SEO from '../components/SEO'
+import { sendMeetingNotification } from '../utils/emailService'
 import './CreatePost.css'
 
 function CreateGroupMeeting({ user }) {
@@ -127,6 +128,39 @@ function CreateGroupMeeting({ user }) {
         .single()
 
       if (insertError) throw insertError
+
+      // Send email notifications to group members
+      try {
+        // Fetch all group members with their email addresses
+        const { data: membersData } = await supabase
+          .from('group_members')
+          .select('user_id')
+          .eq('group_id', group.id)
+
+        if (membersData && membersData.length > 0) {
+          const userIds = membersData.map(m => m.user_id)
+          const { data: profiles } = await supabase
+            .from('profiles')
+            .select('id, email, name')
+            .in('id', userIds)
+
+          if (profiles && profiles.length > 0) {
+            // Send emails (don't wait for completion)
+            sendMeetingNotification({
+              eventType: 'created',
+              meeting: data,
+              group: group,
+              members: profiles,
+            }).catch(error => {
+              console.error('Error sending email notifications:', error)
+              // Don't block navigation if email fails
+            })
+          }
+        }
+      } catch (emailError) {
+        console.error('Error sending email notifications:', emailError)
+        // Don't block navigation if email fails
+      }
 
       // Navigate back to group detail page
       navigate(`/groups/${groupSlug}`)

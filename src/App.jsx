@@ -19,12 +19,13 @@ import GroupDetail from './pages/GroupDetail'
 import GroupSettings from './pages/GroupSettings'
 import CreateGroupMeeting from './pages/CreateGroupMeeting'
 import EditGroupMeeting from './pages/EditGroupMeeting'
+import QuranReader from './pages/QuranReader'
 import NotFound from './pages/NotFound'
 import './App.css'
 
 function AppContent({ user }) {
   const location = useLocation()
-  const hideFooter = location.pathname === '/create' || location.pathname.startsWith('/edit/') || location.pathname === '/groups/create' || (location.pathname.includes('/groups/') && (location.pathname.includes('/settings') || location.pathname.includes('/meeting/')))
+  const hideFooter = location.pathname === '/create' || location.pathname.startsWith('/edit/') || location.pathname === '/groups/create' || location.pathname === '/read' || (location.pathname.includes('/groups/') && (location.pathname.includes('/settings') || location.pathname.includes('/meeting/')))
 
   return (
     <div className="app">
@@ -46,6 +47,7 @@ function AppContent({ user }) {
           <Route path="/groups/:groupSlug/meeting/:meetingId/edit" element={<EditGroupMeeting user={user} />} />
           <Route path="/groups/:groupSlug/settings" element={<GroupSettings user={user} />} />
           <Route path="/groups/:groupSlug" element={<GroupDetail user={user} />} />
+          <Route path="/read" element={<QuranReader user={user} />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="*" element={<NotFound />} />
         </Routes>

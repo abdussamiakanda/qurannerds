@@ -4,6 +4,7 @@ import { Users, BookOpen, Calendar, MapPin, Plus, UserPlus, UserMinus, Settings,
 import { supabase } from '../lib/supabase'
 import SEO from '../components/SEO'
 import { createProfileSlug } from '../utils/textUtils'
+import { sendMeetingNotification } from '../utils/emailService'
 import './GroupDetail.css'
 
 function GroupDetail({ user }) {
@@ -248,12 +249,54 @@ function GroupDetail({ user }) {
     }
 
     try {
+      // Fetch meeting data before deleting (for email notification)
+      const { data: meetingData } = await supabase
+        .from('group_meetings')
+        .select('*')
+        .eq('id', meetingId)
+        .single()
+
       const { error } = await supabase
         .from('group_meetings')
         .delete()
         .eq('id', meetingId)
 
       if (error) throw error
+
+      // Send email notifications to group members
+      if (meetingData && group) {
+        try {
+          // Fetch all group members with their email addresses
+          const { data: membersData } = await supabase
+            .from('group_members')
+            .select('user_id')
+            .eq('group_id', group.id)
+
+          if (membersData && membersData.length > 0) {
+            const userIds = membersData.map(m => m.user_id)
+            const { data: profiles } = await supabase
+              .from('profiles')
+              .select('id, email, name')
+              .in('id', userIds)
+
+            if (profiles && profiles.length > 0) {
+              // Send emails (don't wait for completion)
+              sendMeetingNotification({
+                eventType: 'deleted',
+                meeting: meetingData,
+                group: group,
+                members: profiles,
+              }).catch(error => {
+                console.error('Error sending email notifications:', error)
+                // Don't block UI if email fails
+              })
+            }
+          }
+        } catch (emailError) {
+          console.error('Error sending email notifications:', emailError)
+          // Don't block UI if email fails
+        }
+      }
 
       // Refresh meetings list
       if (group) {

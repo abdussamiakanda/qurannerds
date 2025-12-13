@@ -44,13 +44,6 @@ This document tracks planned features and improvements for the Quran Nerds appli
 - [ ] Discussion forums
 - [ ] Weekly challenges
 
-### 7. Content Management
-- [ ] Post templates
-- [ ] Bulk operations
-- [ ] Post scheduling
-- [ ] Version history
-- [ ] Post archiving
-
 ### 8. Notifications
 - [ ] Email notifications
 - [ ] In-app notifications

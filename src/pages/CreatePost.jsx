@@ -4,6 +4,7 @@ import { supabase } from '../lib/supabase'
 import SEO from '../components/SEO'
 import { createNoteSlug } from '../utils/textUtils'
 import { awardPoints } from '../utils/gamification'
+import { sendNoteCreatedNotification } from '../utils/emailService'
 import RichTextEditor from '../components/RichTextEditor'
 import './CreatePost.css'
 
@@ -80,6 +81,34 @@ function CreatePost({ user }) {
       await awardPoints(user.id, 10, 'post_created', data.id, 'Created a new post')
 
       const noteSlug = createNoteSlug(data.title, data.id)
+      
+      // Send email notifications to all users (excluding author)
+      try {
+        // Fetch all users with profiles and emails
+        const { data: profiles } = await supabase
+          .from('profiles')
+          .select('id, email, name')
+          .not('email', 'is', null)
+
+        if (profiles && profiles.length > 0) {
+          // Send emails (don't wait for completion)
+          sendNoteCreatedNotification({
+            note: { ...data, slug: noteSlug },
+            author: {
+              id: user.id,
+              email: user.email,
+              name: user.user_metadata?.name || user.email?.split('@')[0]
+            },
+            recipients: profiles,
+          }).catch(error => {
+            console.error('Error sending email notifications:', error)
+            // Don't block navigation if email fails
+          })
+        }
+      } catch (emailError) {
+        console.error('Error sending email notifications:', emailError)
+        // Don't block navigation if email fails
+      }
       
       navigate(`/note/${noteSlug}`)
     } catch (error) {

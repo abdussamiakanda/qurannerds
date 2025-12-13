@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
-import { createProfileSlug } from '../utils/textUtils'
+import { createProfileSlug, createNoteSlug } from '../utils/textUtils'
+import { sendCommentCreatedNotification } from '../utils/emailService'
 import { MessageCircle, Trash2, Edit2 } from 'lucide-react'
 import './Comments.css'
 
@@ -62,7 +63,14 @@ function Comments({ postId, user, noteSlug, noteTitle }) {
 
     setLoading(true)
     try {
-      const { error } = await supabase
+      // Fetch note data first (for email notification)
+      const { data: noteData } = await supabase
+        .from('posts')
+        .select('id, title, author_id')
+        .eq('id', postId)
+        .single()
+
+      const { data: commentData, error } = await supabase
         .from('comments')
         .insert([
           {
@@ -71,11 +79,99 @@ function Comments({ postId, user, noteSlug, noteTitle }) {
             content: newComment.trim()
           }
         ])
+        .select()
+        .single()
 
       if (error) throw error
 
       setNewComment('')
       fetchComments()
+
+      // Send email notifications
+      if (noteData && commentData) {
+        try {
+          // Get recipients: note author + other commenters
+          const recipients = []
+          let noteAuthor = null
+          
+          // Add note author
+          if (noteData.author_id) {
+            const { data: authorProfile } = await supabase
+              .from('profiles')
+              .select('id, email, name')
+              .eq('id', noteData.author_id)
+              .single()
+            
+            if (authorProfile && authorProfile.email) {
+              recipients.push(authorProfile)
+              noteAuthor = authorProfile
+            }
+          }
+
+          // Add other commenters (excluding current commenter)
+          const { data: otherComments } = await supabase
+            .from('comments')
+            .select('user_id')
+            .eq('post_id', postId)
+            .neq('user_id', user.id)
+            .neq('id', commentData.id)
+
+          if (otherComments && otherComments.length > 0) {
+            const commenterIds = [...new Set(otherComments.map(c => c.user_id).filter(Boolean))]
+            if (commenterIds.length > 0) {
+              const { data: commenterProfiles } = await supabase
+                .from('profiles')
+                .select('id, email, name')
+                .in('id', commenterIds)
+                .not('email', 'is', null)
+
+              if (commenterProfiles) {
+                // Add commenters that aren't already in recipients
+                commenterProfiles.forEach(profile => {
+                  if (!recipients.find(r => r.id === profile.id)) {
+                    recipients.push(profile)
+                  }
+                })
+              }
+            }
+          }
+
+          if (recipients.length > 0) {
+            const computedNoteSlug = noteSlug || createNoteSlug(noteData.title, noteData.id)
+            
+            // Fetch full note content for excerpt
+            const { data: fullNoteData } = await supabase
+              .from('posts')
+              .select('content')
+              .eq('id', postId)
+              .single()
+            
+            // Send emails (don't wait for completion)
+            sendCommentCreatedNotification({
+              comment: commentData,
+              commenter: {
+                id: user.id,
+                email: user.email,
+                name: user.user_metadata?.name || user.email?.split('@')[0]
+              },
+              note: {
+                id: noteData.id,
+                title: noteData.title,
+                slug: computedNoteSlug,
+                content: fullNoteData?.content || ''
+              },
+              noteAuthor: noteAuthor,
+              recipients: recipients,
+            }).catch(error => {
+              console.error('Error sending email notifications:', error)
+              // Don't block UI if email fails
+            })
+          }
+        } catch (emailError) {
+          console.error('Error sending email notifications:', emailError)
+          // Don't block UI if email fails
+        }
+      }
     } catch (error) {
       console.error('Error adding comment:', error)
       alert('Failed to add comment')
