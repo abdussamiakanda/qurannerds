@@ -24,7 +24,7 @@
   height: calc(100vh - 57px);
   overflow: hidden;
   align-self: flex-start;
-  z-index: 10;
+  z-index: 30;
 }
 
 .surah-list-container {
